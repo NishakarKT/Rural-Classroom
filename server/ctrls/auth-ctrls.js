@@ -6,32 +6,6 @@ import { templateToHTML } from "../services/mail-services.js";
 import { generateJWT, verifyJWT, generateHash, compareHash } from "../services/misc-services.js";
 import { handlebarsReplacements } from "../services/misc-services.js";
 
-export const login = async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) {
-      res.status(422);
-      throw new Error("missing email");
-    } else {
-      // check if user exists
-      const user = await User.findOne({ email });
-      if (!user) {
-        const newUser = new User({ email });
-        const userData = await newUser.save();
-        // generate token
-        const token = generateJWT({ email }, { expiresIn: "30d" });
-        res.status(201).send({ user: userData, message: "new user", token });
-      } else {
-        // generate token
-        const token = generateJWT({ email: user.email }, { expiresIn: "30d" });
-        res.status(200).send({ user, message: "existing User", token });
-      }
-    }
-  } catch (err) {
-    res.send({ message: err.message });
-  }
-};
-
 export const token = async (req, res) => {
   try {
     // check if token is provided
@@ -116,11 +90,14 @@ export const otp_verify = async (req, res) => {
             throw Error("OTP is inavalid");
           } else {
             // delete OTP
-            await Otp.deleteMany({ $or: [{ token }, { email }, { hashedOtp }] });
-            res.status(201).send({ message: "OTP is verified", isVerified: true });
+            await Otp.deleteOne({ $or: [{ token }, { email }, { hashedOtp }] });
+            // create token
+            const newToken = generateJWT({ email }, { expiresIn: "1d" });
+            res.status(201).send({ message: "OTP is verified", isVerified: true, token: newToken });
           }
         } catch (err) {
           res.status(498);
+          console.log(err)
           throw new Error("OTP has expired, try refreshing");
         }
       }

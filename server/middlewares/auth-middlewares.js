@@ -4,6 +4,7 @@ import { verifyJWT } from "../services/misc-services.js";
 export const isAuthenticated = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
+    req.token = authorization;
     if (authorization) {
       // fetch token
       const token = authorization.split(" ")[1];
@@ -18,10 +19,11 @@ export const isAuthenticated = async (req, res, next) => {
         if (user) {
           // set user
           req.user = user;
+          req.token = token;
           next();
         } else {
-          res.status(404);
-          throw new Error("not found");
+          req.token = token;
+          next();
         }
       }
     } else {
