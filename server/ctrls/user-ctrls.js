@@ -38,7 +38,7 @@ export const new_user = async (req, res) => {
         res.status(403);
         throw new Error("user not created");
       } else {
-        res.status(201).send({ user: result, message: "user created" });
+        res.status(201).send({ data: result, message: "user created" });
       }
     }
   } catch (err) {
@@ -67,7 +67,7 @@ export const edit_user = async (req, res) => {
           res.status(404);
           throw new Error("user not found");
         } else {
-          res.status(201).send({ user: result, message: "user updated" });
+          res.status(201).send({ data: result, message: "user updated" });
         }
       } else {
         res.status(404);
@@ -100,7 +100,7 @@ export const delete_user = async (req, res) => {
           res.status(404);
           throw new Error("user not found");
         } else {
-          res.status(202).send({ users: result, message: "user deleted" });
+          res.status(202).send({ data: result, message: "user deleted" });
         }
       } else {
         res.status(404);

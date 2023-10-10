@@ -24,7 +24,7 @@ const courseSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     teacher: { type: String, required: true }, // teacher's _id
-    coordinators: [{ type: String }], // coordinator _ids
+    coordinators: [{ type: String, required: true }], // coordinator _ids
   },
   { timestamps: true }
 );
@@ -55,7 +55,18 @@ const testSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const notificationSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    body: { type: String, required: true },
+    sentTo: [{ type: String, required: true }], // user _id
+    sentBy: { type: String, required: true }, // user _id
+  },
+  { timestamps: true }
+);
+
 export const Otp = new mongoose.model("otp", otpSchema);
 export const User = new mongoose.model("user", userSchema);
 export const Course = new mongoose.model("course", courseSchema);
 export const Test = new mongoose.model("test", testSchema);
+export const Notification = new mongoose.model("notification", notificationSchema);

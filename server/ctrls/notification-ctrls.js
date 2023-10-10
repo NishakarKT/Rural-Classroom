@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { Course } from "../models.js";
+import { Notification } from "../models.js";
 
-export const get_course = async (req, res) => {
+export const get_notification = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -10,12 +10,11 @@ export const get_course = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // get courses
       const query = req.query;
       // check if _id is present and convert it to ObjectId
       if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
-      const courses = await Course.find(query);
-      res.status(200).send({ data: courses, message: "courses found" });
+      const notifications = await Notification.find(query);
+      res.status(200).send({ data: notifications, message: "notifications found" });
     }
   } catch (err) {
     if (res.statusCode < 400) res.status(500);
@@ -23,24 +22,23 @@ export const get_course = async (req, res) => {
   }
 };
 
-export const new_course = async (req, res) => {
+export const new_notification = async (req, res) => {
   try {
     // identify user
     const user = req.user;
-    // check if user exists
     if (!user) {
       res.status(401);
       throw new Error("unauthorized");
     } else {
+      // create notification
       const data = req.body;
-      console.log(data);
-      const result = await new Course(data).save({ new: true });
-      // check if course created
+      const result = await new Notification(data).save({ new: true });
+      // check if notification created
       if (!result) {
         res.status(403);
-        throw new Error("course not created");
+        throw new Error("notification not created");
       } else {
-        res.status(201).send({ data: result, message: "course created" });
+        res.status(201).send({ data: result, message: "notification created" });
       }
     }
   } catch (err) {
@@ -49,7 +47,7 @@ export const new_course = async (req, res) => {
   }
 };
 
-export const edit_course = async (req, res) => {
+export const edit_notification = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -58,22 +56,22 @@ export const edit_course = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // update course
-      const { edits, query } = req.body;
+      // update notifications
+      const { query, edits } = req.body;
       if (query) {
         // check if _id is present and convert it to ObjectId
         if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
-        const result = await Course.updateMany(query, { $set: edits }, { new: true });
-        // check if course updated
+        const result = await Notification.updateMany(query, edits, { new: true });
+        // check if notification updated
         if (!result) {
           res.status(404);
-          throw new Error("courses not found");
+          throw new Error("notification not found");
         } else {
-          res.status(201).send({ data: result, message: "courses updated" });
+          res.status(201).send({ data: result, message: "notification updated" });
         }
       } else {
         res.status(404);
-        throw new Error("courses not found");
+        throw new Error("notification not found");
       }
     }
   } catch (err) {
@@ -82,7 +80,7 @@ export const edit_course = async (req, res) => {
   }
 };
 
-export const delete_course = async (req, res) => {
+export const delete_notification = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -91,22 +89,22 @@ export const delete_course = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // delete courses
+      // delete notification
       const { query } = req.body;
       if (query) {
         // check if _id is present and convert it to ObjectId
         if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
-        const result = await Course.deleteMany(query);
-        // check if courses deleted
+        const result = await Notification.deleteMany(query);
+        // check if notification deleted
         if (!result) {
           res.status(404);
-          throw new Error("courses not found");
+          throw new Error("notification not found");
         } else {
-          res.status(202).send({ data: result, message: "courses deleted" });
+          res.status(202).send({ data: result, message: "notification deleted" });
         }
       } else {
         res.status(404);
-        throw new Error("courses not found");
+        throw new Error("notification not found");
       }
     }
   } catch (err) {

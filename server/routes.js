@@ -7,6 +7,7 @@ import * as authCtrls from "./ctrls/auth-ctrls.js";
 import * as userCtrls from "./ctrls/user-ctrls.js";
 import * as courseCtrls from "./ctrls/course-ctrls.js";
 import * as testCtrls from "./ctrls/test-ctrls.js";
+import * as notificationCtrls from "./ctrls/notification-ctrls.js";
 
 const Router = express.Router();
 
@@ -31,5 +32,10 @@ Router.get("/test/get", isAuthenticated, testCtrls.get_test);
 Router.post("/test/new", isAuthenticated, testCtrls.new_test);
 Router.patch("/test/edit", isAuthenticated, testCtrls.edit_test);
 Router.delete("/test/delete", isAuthenticated, testCtrls.delete_test);
+// Notification Routes
+Router.get("/notification/get", isAuthenticated, notificationCtrls.get_notification);
+Router.post("/notification/new", isAuthenticated, notificationCtrls.new_notification);
+Router.patch("/notification/edit", isAuthenticated, notificationCtrls.edit_notification);
+Router.delete("/notification/delete", isAuthenticated, notificationCtrls.delete_notification);
 
 export default Router;

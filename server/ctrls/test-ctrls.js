@@ -39,7 +39,7 @@ export const new_test = async (req, res) => {
         res.status(403);
         throw new Error("test not created");
       } else {
-        res.status(201).send({ test: result, message: "test created" });
+        res.status(201).send({ data: result, message: "test created" });
       }
     }
   } catch (err) {
@@ -68,7 +68,7 @@ export const edit_test = async (req, res) => {
           res.status(404);
           throw new Error("tests not found");
         } else {
-          res.status(201).send({ tests: result, message: "tests updated" });
+          res.status(201).send({ data: result, message: "tests updated" });
         }
       } else {
         res.status(404);
@@ -101,7 +101,7 @@ export const delete_test = async (req, res) => {
           res.status(404);
           throw new Error("tests not found");
         } else {
-          res.status(202).send({ tests: result, message: "tests deleted" });
+          res.status(202).send({ data: result, message: "tests deleted" });
         }
       } else {
         res.status(404);
