@@ -25,6 +25,7 @@ export const token = async (req, res) => {
       throw new Error("invalid/expired token");
     }
   } catch (err) {
+    if(res.statusCode < 400) res.status(500)
     res.send({ message: err.message || "something went wrong" });
   }
 };
@@ -56,6 +57,7 @@ export const otp_generate = async (req, res) => {
         .catch(() => res.status(424).send({ message: "OTP is not sent" }));
     }
   } catch (err) {
+    if(res.statusCode < 400) res.status(500)
     res.send({ message: err.message || "something went wrong" });
   }
 };
@@ -103,6 +105,7 @@ export const otp_verify = async (req, res) => {
       }
     }
   } catch (err) {
+    if(res.statusCode < 400) res.status(500)
     res.send({ message: err.message || "something went wrong" });
   }
 };

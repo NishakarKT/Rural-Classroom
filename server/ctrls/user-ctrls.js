@@ -13,6 +13,7 @@ export const get_user = async (req, res) => {
       res.status(200).send({ user, message: "user found" });
     }
   } catch (err) {
+    if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
 };
@@ -35,8 +36,8 @@ export const new_user = async (req, res) => {
         throw new Error("user exists already");
       } else {
         // create user
-        const { data } = req.body;
-        const result = await User.create({ ...data, email }, { new: true });
+        const data = req.body;
+        const result = await new User({ ...data, email }).save({ new: true });
         // check if user created
         if (!result) {
           res.status(404);
@@ -47,6 +48,7 @@ export const new_user = async (req, res) => {
       }
     }
   } catch (err) {
+    if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
 };
@@ -72,6 +74,7 @@ export const edit_user = async (req, res) => {
       }
     }
   } catch (err) {
+    if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
 };
@@ -96,6 +99,7 @@ export const delete_user = async (req, res) => {
       }
     }
   } catch (err) {
+    if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
 };
