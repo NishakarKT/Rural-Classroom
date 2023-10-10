@@ -91,6 +91,19 @@ const attendanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const calendarSchema = new mongoose.Schema(
+  {
+    course: { type: String, required: true }, // course _id
+    schedule: [
+      {
+        date: { type: String, required: true }, // date-time ISO string
+        duration: { type: Number, required: true }, // duration in minutes
+      }
+    ]
+  },
+  { timestamps: true }
+);
+
 export const Otp = new mongoose.model("otp", otpSchema);
 export const User = new mongoose.model("user", userSchema);
 export const Student = new mongoose.model("student", studentSchema);
@@ -99,3 +112,4 @@ export const Test = new mongoose.model("test", testSchema);
 export const Notification = new mongoose.model("notification", notificationSchema);
 export const Lecture = new mongoose.model("lecture", lectureSchema);
 export const Attendance = new mongoose.model("attendance", attendanceSchema);
+export const Calendar = new mongoose.model("calendar", calendarSchema);

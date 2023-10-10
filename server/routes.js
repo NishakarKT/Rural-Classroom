@@ -11,6 +11,7 @@ import * as testCtrls from "./ctrls/test-ctrls.js";
 import * as notificationCtrls from "./ctrls/notification-ctrls.js";
 import * as lectureCtrls from "./ctrls/lecture-ctrls.js";
 import * as attendanceCtrls from "./ctrls/attendance-ctrls.js";
+import * as calendarCtrls from "./ctrls/calendar-ctrls.js";
 
 const Router = express.Router();
 
@@ -55,5 +56,10 @@ Router.get("/attendance/get", isAuthenticated, attendanceCtrls.get_attendance);
 Router.post("/attendance/new", isAuthenticated, attendanceCtrls.new_attendance);
 Router.patch("/attendance/edit", isAuthenticated, attendanceCtrls.edit_attendance);
 Router.delete("/attendance/delete", isAuthenticated, attendanceCtrls.delete_attendance);
+// Calendar Routes
+Router.get("/calendar/get", isAuthenticated, calendarCtrls.get_calendar);
+Router.post("/calendar/new", isAuthenticated, calendarCtrls.new_calendar);
+Router.patch("/calendar/edit", isAuthenticated, calendarCtrls.edit_calendar);
+Router.delete("/calendar/delete", isAuthenticated, calendarCtrls.delete_calendar);
 
 export default Router;
