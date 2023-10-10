@@ -12,6 +12,7 @@ import * as notificationCtrls from "./ctrls/notification-ctrls.js";
 import * as lectureCtrls from "./ctrls/lecture-ctrls.js";
 import * as attendanceCtrls from "./ctrls/attendance-ctrls.js";
 import * as calendarCtrls from "./ctrls/calendar-ctrls.js";
+import * as performanceCtrls from "./ctrls/performance-ctrls.js";
 
 const Router = express.Router();
 
@@ -61,5 +62,10 @@ Router.get("/calendar/get", isAuthenticated, calendarCtrls.get_calendar);
 Router.post("/calendar/new", isAuthenticated, calendarCtrls.new_calendar);
 Router.patch("/calendar/edit", isAuthenticated, calendarCtrls.edit_calendar);
 Router.delete("/calendar/delete", isAuthenticated, calendarCtrls.delete_calendar);
+// Performance Routes
+Router.get("/performance/get", isAuthenticated, performanceCtrls.get_performance);
+Router.post("/performance/new", isAuthenticated, performanceCtrls.new_performance);
+Router.patch("/performance/edit", isAuthenticated, performanceCtrls.edit_performance);
+Router.delete("/performance/delete", isAuthenticated, performanceCtrls.delete_performance);
 
 export default Router;

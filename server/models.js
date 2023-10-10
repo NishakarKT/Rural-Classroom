@@ -77,6 +77,7 @@ const notificationSchema = new mongoose.Schema(
 const lectureSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
+    path: { type: String, required: true },
     description: { type: String },
     course: { type: String, required: true }, // course _id
   },
@@ -104,6 +105,20 @@ const calendarSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const performanceSchema = new mongoose.Schema(
+  {
+    student: { type: String, required: true }, // student _id
+    course: { type: String, required: true }, // course _id
+    tests: [
+      {
+        test: { type: String, required: true }, // test _id
+        score: { type: Number, required: true }, // score in percentage
+      }
+    ]
+  },
+  { timestamps: true }
+);
+
 export const Otp = new mongoose.model("otp", otpSchema);
 export const User = new mongoose.model("user", userSchema);
 export const Student = new mongoose.model("student", studentSchema);
@@ -113,3 +128,4 @@ export const Notification = new mongoose.model("notification", notificationSchem
 export const Lecture = new mongoose.model("lecture", lectureSchema);
 export const Attendance = new mongoose.model("attendance", attendanceSchema);
 export const Calendar = new mongoose.model("calendar", calendarSchema);
+export const Performance = new mongoose.model("performance", performanceSchema);
