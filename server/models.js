@@ -20,6 +20,15 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const studentSchema = new mongoose.Schema(
+  {
+    name: { type: String },
+    roll: { type: String, required: true, unique: true },
+    contact: { type: String }
+  },
+  { timestamps: true }
+);
+
 const courseSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -65,8 +74,28 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const lectureSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    description: { type: String },
+    course: { type: String, required: true }, // course _id
+  },
+  { timestamps: true }
+);
+
+const attendanceSchema = new mongoose.Schema(
+  {
+    lecture: { type: String, required: true }, // lecture _id
+    present: [{ type: String, required: true }], // student _ids
+  },
+  { timestamps: true }
+);
+
 export const Otp = new mongoose.model("otp", otpSchema);
 export const User = new mongoose.model("user", userSchema);
+export const Student = new mongoose.model("student", studentSchema);
 export const Course = new mongoose.model("course", courseSchema);
 export const Test = new mongoose.model("test", testSchema);
 export const Notification = new mongoose.model("notification", notificationSchema);
+export const Lecture = new mongoose.model("lecture", lectureSchema);
+export const Attendance = new mongoose.model("attendance", attendanceSchema);

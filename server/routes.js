@@ -5,9 +5,12 @@ import { isAuthenticated } from "./middlewares/auth-middlewares.js";
 import * as miscCtrls from "./ctrls/misc-ctrls.js";
 import * as authCtrls from "./ctrls/auth-ctrls.js";
 import * as userCtrls from "./ctrls/user-ctrls.js";
+import * as studentCtrls from "./ctrls/student-ctrls.js";
 import * as courseCtrls from "./ctrls/course-ctrls.js";
 import * as testCtrls from "./ctrls/test-ctrls.js";
 import * as notificationCtrls from "./ctrls/notification-ctrls.js";
+import * as lectureCtrls from "./ctrls/lecture-ctrls.js";
+import * as attendanceCtrls from "./ctrls/attendance-ctrls.js";
 
 const Router = express.Router();
 
@@ -22,6 +25,11 @@ Router.get("/user/get", isAuthenticated, userCtrls.get_user);
 Router.post("/user/new", isAuthenticated, userCtrls.new_user);
 Router.patch("/user/edit", isAuthenticated, userCtrls.edit_user);
 Router.delete("/user/delete", isAuthenticated, userCtrls.delete_user);
+// Student Routes
+Router.get("/student/get", isAuthenticated, studentCtrls.get_student);
+Router.post("/student/new", isAuthenticated, studentCtrls.new_student);
+Router.patch("/student/edit", isAuthenticated, studentCtrls.edit_student);
+Router.delete("/student/delete", isAuthenticated, studentCtrls.delete_student);
 // Course Routes
 Router.get("/course/get", isAuthenticated, courseCtrls.get_course);
 Router.post("/course/new", isAuthenticated, courseCtrls.new_course);
@@ -37,5 +45,15 @@ Router.get("/notification/get", isAuthenticated, notificationCtrls.get_notificat
 Router.post("/notification/new", isAuthenticated, notificationCtrls.new_notification);
 Router.patch("/notification/edit", isAuthenticated, notificationCtrls.edit_notification);
 Router.delete("/notification/delete", isAuthenticated, notificationCtrls.delete_notification);
+// Lecture Routes
+Router.get("/lecture/get", isAuthenticated, lectureCtrls.get_lecture);
+Router.post("/lecture/new", isAuthenticated, lectureCtrls.new_lecture);
+Router.patch("/lecture/edit", isAuthenticated, lectureCtrls.edit_lecture);
+Router.delete("/lecture/delete", isAuthenticated, lectureCtrls.delete_lecture);
+// Attendance Routes
+Router.get("/attendance/get", isAuthenticated, attendanceCtrls.get_attendance);
+Router.post("/attendance/new", isAuthenticated, attendanceCtrls.new_attendance);
+Router.patch("/attendance/edit", isAuthenticated, attendanceCtrls.edit_attendance);
+Router.delete("/attendance/delete", isAuthenticated, attendanceCtrls.delete_attendance);
 
 export default Router;
