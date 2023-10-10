@@ -16,15 +16,11 @@ export const isAuthenticated = async (req, res, next) => {
       } else {
         // check if user exists
         const user = await User.findOne({ email: decoded.email });
-        if (user) {
-          // set user
+        // set user
+        if (user)
           req.user = user;
-          req.token = token;
-          next();
-        } else {
-          req.token = token;
-          next();
-        }
+        // next
+        next();
       }
     } else {
       res.status(401);

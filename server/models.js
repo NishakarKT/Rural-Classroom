@@ -25,7 +25,6 @@ const courseSchema = new mongoose.Schema(
     name: { type: String, required: true },
     teacher: { type: String, required: true }, // teacher's _id
     coordinators: [{ type: String }], // coordinator _ids
-    calendar: { type: String, required: true }, // calendar _id
   },
   { timestamps: true }
 );

@@ -13,7 +13,7 @@ const Router = express.Router();
 // misc rouets
 Router.get("/", miscCtrls.index);
 // Auth Routes
-Router.post("/auth/token", authCtrls.token);
+Router.post("/auth/token", isAuthenticated, authCtrls.token);
 Router.post("/auth/otp-generate", authCtrls.otp_generate);
 Router.post("/auth/otp-verify", authCtrls.otp_verify);
 // User Routes

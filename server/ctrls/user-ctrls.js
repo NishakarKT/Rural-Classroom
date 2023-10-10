@@ -1,5 +1,5 @@
+import mongoose from "mongoose";
 import { User } from "../models.js";
-import { verifyJWT } from "../services/misc-services.js";
 
 export const get_user = async (req, res) => {
   try {
@@ -10,7 +10,11 @@ export const get_user = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      res.status(200).send({ user, message: "user found" });
+      const query = req.query;
+      // check if _id is present and convert it to ObjectId
+      if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+      const users = await User.find(query);
+      res.status(200).send({ data: users, message: "users found" });
     }
   } catch (err) {
     if (res.statusCode < 400) res.status(500);
@@ -21,30 +25,20 @@ export const get_user = async (req, res) => {
 export const new_user = async (req, res) => {
   try {
     // identify user
-    const token = req.token;
-    const decoded = verifyJWT(token);
-    console.log(decoded);
-    if (!decoded) {
+    const user = req.user;
+    if (!user) {
       res.status(401);
-      throw new Error("invalid/expired token");
+      throw new Error("unauthorized");
     } else {
-      const email = decoded.email;
-      // check if user exists
-      const user = await User.findOne({ email });
-      if (user) {
+      // create user
+      const data = req.body;
+      const result = await new User(data).save({ new: true });
+      // check if user created
+      if (!result) {
         res.status(403);
-        throw new Error("user exists already");
+        throw new Error("user not created");
       } else {
-        // create user
-        const data = req.body;
-        const result = await new User({ ...data, email }).save({ new: true });
-        // check if user created
-        if (!result) {
-          res.status(404);
-          throw new Error("user not created");
-        } else {
-          res.status(201).send({ user: result, message: "user created" });
-        }
+        res.status(201).send({ user: result, message: "user created" });
       }
     }
   } catch (err) {
@@ -62,15 +56,22 @@ export const edit_user = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // update user
-      const { edits } = req.body;
-      const result = await User.findByIdAndUpdate(user._id, edits, { new: true });
-      // check if user updated
-      if (!result) {
+      // update users
+      const { query, edits } = req.body;
+      if (query) {
+        // check if _id is present and convert it to ObjectId
+        if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+        const result = await User.updateMany(query, edits, { new: true });
+        // check if user updated
+        if (!result) {
+          res.status(404);
+          throw new Error("user not found");
+        } else {
+          res.status(201).send({ user: result, message: "user updated" });
+        }
+      } else {
         res.status(404);
         throw new Error("user not found");
-      } else {
-        res.status(201).send({ user: result, message: "user updated" });
       }
     }
   } catch (err) {
@@ -89,13 +90,21 @@ export const delete_user = async (req, res) => {
       throw new Error("unauthorized");
     } else {
       // delete user
-      const result = await User.findByIdAndDelete(user._id);
-      // check if user deleted
-      if (!result) {
+      const { query } = req.body;
+      if (query) {
+        // check if _id is present and convert it to ObjectId
+        if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+        const result = await User.deleteMany(query);
+        // check if user deleted
+        if (!result) {
+          res.status(404);
+          throw new Error("user not found");
+        } else {
+          res.status(202).send({ users: result, message: "user deleted" });
+        }
+      } else {
         res.status(404);
         throw new Error("user not found");
-      } else {
-        res.status(202).send({ message: "user deleted" });
       }
     }
   } catch (err) {

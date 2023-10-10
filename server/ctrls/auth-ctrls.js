@@ -8,24 +8,15 @@ import { handlebarsReplacements } from "../services/misc-services.js";
 
 export const token = async (req, res) => {
   try {
-    // check if token is provided
-    const token = req.headers.authorization.split(" ")[1];
-    if (!token) {
-      res.status(404);
-      throw new Error("missing token");
-    }
-    // verify token
-    const decoded = verifyJWT(token);
-    // check if user exists
-    const user = await User.findOne({ email: decoded.email });
-    if (user) {
-      res.status(200).send({ user, message: "existing user" });
-    } else {
+    const user = req.user;
+    if (!user) {
       res.status(401);
-      throw new Error("invalid/expired token");
+      throw new Error("unauthorized");
+    } else {
+      res.status(200).send({ data: user, message: "existing user" });
     }
   } catch (err) {
-    if(res.statusCode < 400) res.status(500)
+    if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
 };
@@ -57,7 +48,7 @@ export const otp_generate = async (req, res) => {
         .catch(() => res.status(424).send({ message: "OTP is not sent" }));
     }
   } catch (err) {
-    if(res.statusCode < 400) res.status(500)
+    if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
 };
@@ -93,19 +84,21 @@ export const otp_verify = async (req, res) => {
           } else {
             // delete OTP
             await Otp.deleteOne({ $or: [{ token }, { email }, { hashedOtp }] });
+            // create user
+            await new User({ email }).save();
             // create token
             const newToken = generateJWT({ email }, { expiresIn: "1d" });
             res.status(201).send({ message: "OTP is verified", isVerified: true, token: newToken });
           }
         } catch (err) {
           res.status(498);
-          console.log(err)
+          console.log(err);
           throw new Error("OTP has expired, try refreshing");
         }
       }
     }
   } catch (err) {
-    if(res.statusCode < 400) res.status(500)
+    if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
 };
