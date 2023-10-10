@@ -6,6 +6,7 @@ import * as miscCtrls from "./ctrls/misc-ctrls.js";
 import * as authCtrls from "./ctrls/auth-ctrls.js";
 import * as userCtrls from "./ctrls/user-ctrls.js";
 import * as courseCtrls from "./ctrls/course-ctrls.js";
+import * as testCtrls from "./ctrls/test-ctrls.js";
 
 const Router = express.Router();
 
@@ -25,5 +26,10 @@ Router.get("/course/get", isAuthenticated, courseCtrls.get_course);
 Router.post("/course/new", isAuthenticated, courseCtrls.new_course);
 Router.patch("/course/edit", isAuthenticated, courseCtrls.edit_course);
 Router.delete("/course/delete", isAuthenticated, courseCtrls.delete_course);
+// Test Routes
+Router.get("/test/get", isAuthenticated, testCtrls.get_test);
+Router.post("/test/new", isAuthenticated, testCtrls.new_test);
+Router.patch("/test/edit", isAuthenticated, testCtrls.edit_test);
+Router.delete("/test/delete", isAuthenticated, testCtrls.delete_test);
 
 export default Router;

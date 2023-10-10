@@ -1,6 +1,6 @@
-import { Course } from "../models.js";
+import { Test } from "../models.js";
 
-export const get_course = async (req, res) => {
+export const get_test = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -9,14 +9,14 @@ export const get_course = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // get courses
+      // get tests
       const { query } = req.body;
       if (query) {
-        const courses = await Course.find(query);
-        res.status(200).send({ courses, message: "courses found" });
+        const tests = await Test.find(query);
+        res.status(200).send({ tests, message: "tests found" });
       } else {
         res.status(404);
-        throw new Error("courses not found");
+        throw new Error("tests not found");
       }
     }
   } catch (err) {
@@ -25,7 +25,7 @@ export const get_course = async (req, res) => {
   }
 };
 
-export const new_course = async (req, res) => {
+export const new_test = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -35,14 +35,13 @@ export const new_course = async (req, res) => {
       throw new Error("unauthorized");
     } else {
       const data = req.body;
-      console.log(data);
-      const result = await new Course(data).save({ new: true });
-      // check if course created
+      const result = await new Test(data).save({ new: true });
+      // check if test created
       if (!result) {
         res.status(403);
-        throw new Error("course not created");
+        throw new Error("test not created");
       } else {
-        res.status(201).send({ course: result, message: "course created" });
+        res.status(201).send({ test: result, message: "test created" });
       }
     }
   } catch (err) {
@@ -51,7 +50,7 @@ export const new_course = async (req, res) => {
   }
 };
 
-export const edit_course = async (req, res) => {
+export const edit_test = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -60,15 +59,15 @@ export const edit_course = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // update course
+      // update test
       const { edits, query } = req.body;
-      const result = await Course.updateMany(query, { $set: edits }, { new: true });
-      // check if course updated
+      const result = await Test.updateMany(query, { $set: edits }, { new: true });
+      // check if test updated
       if (!result) {
         res.status(404);
-        throw new Error("courses not found");
+        throw new Error("tests not found");
       } else {
-        res.status(201).send({ courses: result, message: "courses updated" });
+        res.status(201).send({ tests: result, message: "tests updated" });
       }
     }
   } catch (err) {
@@ -77,7 +76,7 @@ export const edit_course = async (req, res) => {
   }
 };
 
-export const delete_course = async (req, res) => {
+export const delete_test = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -86,15 +85,15 @@ export const delete_course = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // delete courses
+      // delete tests
       const { query } = req.body;
-      const result = await Course.deleteMany(query);
-      // check if courses deleted
+      const result = await Test.deleteMany(query);
+      // check if tests deleted
       if (!result) {
         res.status(404);
-        throw new Error("courses not found");
+        throw new Error("tests not found");
       } else {
-        res.status(202).send({ message: "courses deleted" });
+        res.status(202).send({ message: "tests deleted" });
       }
     }
   } catch (err) {
