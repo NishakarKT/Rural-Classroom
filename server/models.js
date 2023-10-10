@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     contact: { type: String },
     role: { type: String, default: "coordinator" },
+    profiePic: { type: String }, // path to file
+    coverPic: { type: String }, // path to file
     courses: [{ type: String, required: true, default: [] }], // course _ids
   },
   { timestamps: true }
@@ -24,7 +26,8 @@ const studentSchema = new mongoose.Schema(
   {
     name: { type: String },
     roll: { type: String, required: true, unique: true },
-    contact: { type: String }
+    contact: { type: String },
+    profiePic: { type: String }, // path to file
   },
   { timestamps: true }
 );
@@ -34,6 +37,7 @@ const courseSchema = new mongoose.Schema(
     name: { type: String, required: true },
     teacher: { type: String, required: true }, // teacher's _id
     coordinators: [{ type: String, required: true }], // coordinator _ids
+    picture: { type: String }, // path to file
   },
   { timestamps: true }
 );
@@ -80,6 +84,7 @@ const lectureSchema = new mongoose.Schema(
     path: { type: String, required: true },
     description: { type: String },
     course: { type: String, required: true }, // course _id
+    thumbnail: { type: String }, // path to file
   },
   { timestamps: true }
 );

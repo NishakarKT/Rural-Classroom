@@ -18,6 +18,9 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 // set up cors
 app.use(cors());
 
+// set up static files
+app.use(express.static('uploads'));
+
 // set up routes
 app.use("/", Router);
 

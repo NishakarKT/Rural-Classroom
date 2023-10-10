@@ -1,8 +1,10 @@
 import express from "express";
 // middlewares
 import { isAuthenticated } from "./middlewares/auth-middlewares.js";
+import { upload } from "./services/file-services.js";
 // controllers
 import * as miscCtrls from "./ctrls/misc-ctrls.js";
+import * as fileCtrls from "./ctrls/file-ctrls.js";
 import * as authCtrls from "./ctrls/auth-ctrls.js";
 import * as userCtrls from "./ctrls/user-ctrls.js";
 import * as studentCtrls from "./ctrls/student-ctrls.js";
@@ -16,8 +18,10 @@ import * as performanceCtrls from "./ctrls/performance-ctrls.js";
 
 const Router = express.Router();
 
-// misc rouets
+// misc routes
 Router.get("/", miscCtrls.index);
+// file routes
+Router.post("/file/upload", isAuthenticated, upload.array('files'), fileCtrls.uploadFiles);
 // Auth Routes
 Router.post("/auth/token", isAuthenticated, authCtrls.token);
 Router.post("/auth/otp-generate", authCtrls.otp_generate);
