@@ -37,6 +37,7 @@ const courseSchema = new mongoose.Schema(
     name: { type: String, required: true },
     teacher: { type: String, required: true }, // teacher's _id
     coordinators: [{ type: String, required: true }], // coordinator _ids
+    materials: [{ type: String, required: true }], // path to files
     picture: { type: String }, // path to file
   },
   { timestamps: true }
