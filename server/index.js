@@ -8,7 +8,6 @@ import cors from "cors";
 import Router from "./routes.js";
 import http from "http";
 import { Server } from "socket.io";
-import NodeMediaServer from "node-media-server";
 
 // initialize express
 const app = express();
@@ -28,36 +27,28 @@ app.use(express.static("uploads"));
 // set up routes
 app.use("/", Router);
 
-// initialize Node-Media-Server
-const nms = new NodeMediaServer({
-    rtmp: {
-      port: process.env.NMS_RTMP_PORT || 1935,
-      chunk_size: 60000,
-      gop_cache: true,
-      ping: 30,
-      ping_timeout: 60,
-    },
-    http: {
-      port: process.env.NMS_HTTP_PORT || 8001,
-      allow_origin: '*',
-    },
-  });
-  nms.run();
-
 // set up sockets
+let peerIds = {};
 io.on("connection", (socket) => {
-  console.log("A user connected");
+  console.log("User connected >> " + socket.id);
   // handle joining a room (room ~ lecture _id)
   socket.on("join", (room) => {
     socket.join(room);
+    socket.emit("stream", { peerId: peerIds[room]});
   });
   // handle messages
-  socket.on("message", ({room, from, text}) => {
-    io.to(room).emit("message", {from, text, date: new Date().toISOString()});
+  socket.on("message", ({ room, from, text }) => {
+    io.to(room).emit("message", { from, text, date: new Date().toISOString() });
+  });
+  // handle stream
+  socket.on("stream", ({ room, peerId }) => {
+    peerIds[room] = peerId;
+    console.log(peerIds);
+    io.to(room).emit("stream", { peerId });
   });
   // handle disconnects
   socket.on("disconnect", () => {
-    console.log("A user disconnected");
+    console.log("User disconnected >> " + socket.id);
   });
 });
 
