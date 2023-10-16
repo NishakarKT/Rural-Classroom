@@ -28,13 +28,15 @@ app.use(express.static("uploads"));
 app.use("/", Router);
 
 // set up sockets
-let peerIds = {};
 io.on("connection", (socket) => {
   console.log("User connected >> " + socket.id);
   // handle joining a room (room ~ lecture _id)
-  socket.on("join", (room) => {
+  socket.on("join", ({ room }) => {
     socket.join(room);
-    socket.emit("stream", { peerId: peerIds[room]});
+  });
+  // handle doubts
+  socket.on("doubts", ({ room, doubts }) => {
+    io.to(room).emit("doubts", { doubts, date: new Date().toISOString() });
   });
   // handle messages
   socket.on("message", ({ room, from, text }) => {
@@ -42,8 +44,6 @@ io.on("connection", (socket) => {
   });
   // handle stream
   socket.on("stream", ({ room, peerId }) => {
-    peerIds[room] = peerId;
-    console.log(peerIds);
     io.to(room).emit("stream", { peerId });
   });
   // handle disconnects
