@@ -1,0 +1,71 @@
+
+.profile-container {
+    margin: 0px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: rgb(201, 182, 182);
+    text-align: center;
+    /* overflow: auto; /* Enable scrolling when content exceeds the container */
+    /* max-height: 80vh;  */
+    margin-top: 10px;
+    margin-bottom: 400px;
+  }
+  .profile-heading{
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  .profile-photo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5px;
+    /* padding-top:1px ; */
+  }
+  
+  .profile-photo img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 2px;
+  }
+  
+  .profile-details .profile-field {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    width: 50vw;
+    padding-left:100px;
+  }
+  .profile-details .profile-field .placeholder {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 1.2rem;
+  }
+  .profile-details label {
+    font-weight: bold;
+    font-size: 1.2rem;
+    width: 30vw;
+  }
+  
+  .profile-details input {
+    width: 100%;
+    padding: 5px;
+  }
+  
+  .profile-details span {
+    display: block;
+    width: 100%;
+    padding: 5px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+  }
+  .photo-edit {
+    margin-bottom: 10px;
+  }
+  .photo-edit span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right:10px ;
+  }
+  

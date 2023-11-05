@@ -1,0 +1,5 @@
+# Deployed Links
+1. Frontend: 
+2. Backend: https://ruralclassroom.onrender.com
+3. Database: Mongo DB
+4. API List: 
