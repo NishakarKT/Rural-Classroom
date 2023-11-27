@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Grid } from '@mui/material'
 import Sidebar from './Sidebar'
 import Nav from './Nav'
 import Lectures from './Lectures'
 import Tests from './Tests'
 import AddCourseDialog from './AddCourseDialog'
+import { useGlobalContext } from '../hooks/useGlobalContext'
+import CreateProfile from './CreateProfile'
 
 const Home = () => {
+  const {user} =useContext(useGlobalContext);
+  console.log(user)
+  
   const [open,setOpen] = useState(false);
+  const [editProfile,setEditProfile]=useState(!user.name);
   
   const handleOpen = () => {
     setOpen(true);
@@ -15,6 +21,10 @@ const Home = () => {
 
   const handleClose = () => {
     setOpen(false);
+  }
+
+  const handleCloseEdit = () => {
+    setEditProfile(false);
   }
   
   return (
@@ -30,6 +40,7 @@ const Home = () => {
         </Grid>
       </Grid>
       <AddCourseDialog open={open} handleClose={handleClose}/>
+      <CreateProfile open={editProfile} handleClose={handleCloseEdit}/>
     </div>
   )
 }

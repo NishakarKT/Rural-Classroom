@@ -10,7 +10,7 @@ const LectureCard = ({
   
   return (
     <Grid item xs={2.8} component={Card}>
-      <CardActionArea onClick={()=> navigate(`/lecture/${lecture.id}`)}>
+      <CardActionArea onClick={()=> navigate(`/live/${lecture.id}`)}>
         <CardMedia component="img" image={img} alt='An image' />
         <CardContent>
           <Typography>

@@ -1,6 +1,7 @@
 import { IconButton, Menu, MenuItem } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu';
-import React from 'react'
+import React, { useContext } from 'react'
+import { useGlobalContext } from '../hooks/useGlobalContext';
 
 const HamMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -11,7 +12,13 @@ const HamMenu = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  const {setUser, setToken} = useContext(useGlobalContext);
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null);
+    setToken(null);
+  } 
   
   return (
     <div>
@@ -35,7 +42,7 @@ const HamMenu = () => {
       >
         <MenuItem onClick={handleClose}>Profile</MenuItem>
         <MenuItem onClick={handleClose}>My account</MenuItem>
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
   )
