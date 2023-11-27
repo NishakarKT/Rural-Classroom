@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     contact: { type: String },
     role: { type: String, default: "coordinator" },
-    profiePic: { type: String }, // path to file
+    profilePic: { type: String }, // path to file
     coverPic: { type: String }, // path to file
     courses: [{ type: String, required: true, default: [] }], // course _ids
   },

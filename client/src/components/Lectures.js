@@ -1,5 +1,5 @@
-import { Box, Grid, Typography } from '@mui/material'
-import React, { useContext } from 'react'
+import { Box, Button, Grid, Typography } from '@mui/material'
+import React, { useContext, useState } from 'react'
 import { useGlobalContext } from '../hooks/useGlobalContext'
 import LectureCard from './LectureCard';
 
@@ -7,8 +7,14 @@ const Lectures = () => {
 
   const { userRole, lectures } = useContext(useGlobalContext);
   
+  const [isExpanded,setIsExpanded] = useState(false);
+  
   return (
-    <Box>
+    <Box
+      sx={{
+        mb: lectures.length>4 ? 8 : 4,
+      }}
+    >
       <Typography>
         {`${userRole==='teacher' ? 'Upcoming ' : ''}Lectures`}
       </Typography>
@@ -18,7 +24,7 @@ const Lectures = () => {
             <Typography> No lectures to show</Typography>
           </Grid>
         ):(
-          lectures.map(lecture => (
+          (isExpanded ? lectures : lectures.slice(0,4)).map(lecture => (
             <LectureCard
               lecture={lecture}
               key={lecture.id}
@@ -26,6 +32,18 @@ const Lectures = () => {
           ))
         ))}
       </Grid>
+      {lectures.length>4 && (
+        <Button
+          onClick={()=>setIsExpanded(x=>!x)}
+          variant='text'
+          sx={{
+            float:'right',
+            mr:8,
+          }}
+        >
+          {isExpanded ? 'Show less...' : 'Show more...'}
+        </Button>
+      )}
 
     </Box>
   )

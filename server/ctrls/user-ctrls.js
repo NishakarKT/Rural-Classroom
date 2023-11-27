@@ -67,7 +67,8 @@ export const edit_user = async (req, res) => {
           res.status(404);
           throw new Error("user not found");
         } else {
-          res.status(201).send({ data: result, message: "user updated" });
+          const user = await User.findById(query._id);
+          res.status(201).send({ data: result, message: "user updated", user });
         }
       } else {
         res.status(404);

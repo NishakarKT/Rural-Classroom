@@ -17,6 +17,11 @@ const Sidebar = ({
         flexDirection: 'column',
         alignItems:'center',
         gap: 4,
+        position: 'sticky',
+        zIndex: 1,
+        top: 0,
+        left: 0,
+        overflowX: 'hidden',
       }}
       height={'100vh'}
     >

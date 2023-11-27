@@ -6,6 +6,7 @@ const Courses = () => {
 
   const { userRole, courses } = useContext(useGlobalContext);
   
+  
   return (
     <Box
       sx={{
