@@ -45,7 +45,7 @@ export const otp_generate = async (req, res) => {
       // sending mail
       sendMail({ to: email, subject: "OTP verification | " + process.env.COMPANY, html: content })
         .then(() => res.status(200).send({ message: "OTP is sent", token }))
-        .catch(() => res.status(424).send({ message: "OTP is not sent" }));
+        .catch((err) => {console.log(err); return res.status(424).send({ message: "OTP is not sent" });});
     }
   } catch (err) {
     if (res.statusCode < 400) res.status(500);
@@ -85,10 +85,13 @@ export const otp_verify = async (req, res) => {
             // delete OTP
             await Otp.deleteOne({ $or: [{ token }, { email }, { hashedOtp }] });
             // create user
-            await new User({ email }).save();
+            let user = await User.findOne({ email });
+            if(!user){
+              user = await new User({ email }).save();
+            }
             // create token
             const newToken = generateJWT({ email }, { expiresIn: "1d" });
-            res.status(201).send({ message: "OTP is verified", isVerified: true, token: newToken });
+            res.status(201).send({ message: "OTP is verified", isVerified: true, user, token: newToken });
           }
         } catch (err) {
           res.status(498);
