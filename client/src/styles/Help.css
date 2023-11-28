@@ -1,0 +1,44 @@
+.help-page {
+    margin-left:300px;
+    width:60vw;
+    height:50vh;
+}
+.search-button {
+    margin-left:10px;
+    height:30px;
+    width:80px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+}
+.search-bar1 {
+    width:350px;
+    margin-left:150px;
+    height:30px;
+}
+.heading {
+    margin-left: 200px;
+    font-size: large;
+    margin-bottom: 30px;
+}
+.card-container, .card-container1{
+    display: flex;
+    flex-wrap: nowrap;
+}
+.btn {
+    width:400px;
+    /* background-color: #4517b9; */
+    
+}
+
+.help-page .card{
+    margin: 30px 30px;
+    margin-bottom:10px;
+    /* background-color: rgb(223, 155, 107);
+     */
+
+}
+.header{
+    
+    color:blue;
+    font-size: 24px;
+    font-weight: bold;
+}
