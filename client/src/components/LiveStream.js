@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { Peer } from "peerjs";
+// constants
+import { BASE } from "../constants/endpoints";
 // components
 import Chart from "./Chart";
 
 const user = { _id: "6524cdd255568cea7c54eb10" };
 const lectureId = "652521e3c889daf0886d4678";
-const socket = io("http://localhost:8000");
+const socket = io(BASE);
 
 const LiveStream = () => {
   const [role, setRole] = useState("coordinator");

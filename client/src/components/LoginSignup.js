@@ -8,6 +8,8 @@ import { Button, Snackbar, TextField } from '@mui/material';
 import {useGlobalContext} from '../hooks/useGlobalContext'
 import { useNavigate } from 'react-router-dom';
 
+import { AUTH_OTP_GENERATE_ENDPOINT, AUTH_OTP_VERIFY_ENDPOINT } from '../constants/endpoints';
+
 export const LoginSignup = () => {
     const [action,setAction]=useState("Send OTP");  
     const [email,setEmail]=useState(""); 
@@ -22,7 +24,7 @@ export const LoginSignup = () => {
     
     const handleClick = async ()=>{
         if(action==='Send OTP'){
-            await fetch('http://localhost:8000/auth/otp-generate',{
+            await fetch(AUTH_OTP_GENERATE_ENDPOINT,{
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({email}),
@@ -38,7 +40,7 @@ export const LoginSignup = () => {
             });
         } else if(action==='Login'){
             console.log(otp,tempToken);
-            await fetch('http://localhost:8000/auth/otp-verify',{
+            await fetch(AUTH_OTP_VERIFY_ENDPOINT,{
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({otp,token: tempToken}),

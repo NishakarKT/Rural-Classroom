@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+// // constants
+// import { BASE } from "./constants/endpoints";
 // components
 import LiveStream from "./components/LiveStream";
 import Home from "./components/Home";
@@ -20,7 +22,7 @@ import CreateProfile from "./components/CreateProfile";
 
 // const user = { _id: "6524cdd255568cea7c54eb10" };
 // const lectureId = "652521e3c889daf0886d4678";
-// const socket = io("http://localhost:8000");
+// const socket = io(BASE);
 
 const App = () => {
 
