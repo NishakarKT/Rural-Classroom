@@ -13,10 +13,10 @@ const CreateProfile = ({ open, handleClose }) => {
   });
 
   const [profile, setProfile] = useState({
-    name: user.name || "",
-    contact: user.contact || "",
-    profilePic: user.profilePic || "",
-    coverPic: user.coverPic || "",
+    name: user?.name || "",
+    contact: user?.contact || "",
+    profilePic: user?.profilePic || "",
+    coverPic: user?.coverPic || "",
   });
 
   const uploadProfilePic = async (files) => {
@@ -95,7 +95,6 @@ const CreateProfile = ({ open, handleClose }) => {
       .then((res) => res.json())
       .then((data) => {
         setUser(data.user);
-        localStorage.setItem("user", JSON.stringify(data.user));
         handleClose();
       });
   };
@@ -124,7 +123,7 @@ const CreateProfile = ({ open, handleClose }) => {
               InputProps={{
                 readOnly: true,
               }}
-              value={user.role}
+              value={user?.role}
             />
           </Box>
         </Box>

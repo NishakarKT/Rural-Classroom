@@ -1,48 +1,51 @@
-import React, { useContext, useState } from 'react'
-import { Grid } from '@mui/material'
-import Sidebar from './Sidebar'
-import Nav from './Nav'
-import Lectures from './Lectures'
-import Tests from './Tests'
-import AddCourseDialog from './AddCourseDialog'
-import { useGlobalContext } from '../hooks/useGlobalContext'
-import CreateProfile from './CreateProfile'
+import React, { useContext, useState, useEffect } from "react";
+import { Grid } from "@mui/material";
+import Sidebar from "./Sidebar";
+import Nav from "./Nav";
+import Lectures from "./Lectures";
+import Tests from "./Tests";
+import AddCourseDialog from "./AddCourseDialog";
+import { useGlobalContext } from "../hooks/useGlobalContext";
+import CreateProfile from "./CreateProfile";
 
 const Home = () => {
-  const {user} =useContext(useGlobalContext);
-  console.log(user)
-  
-  const [open,setOpen] = useState(false);
-  const [editProfile,setEditProfile]=useState(!user.name);
-  
+  const { user } = useContext(useGlobalContext);
+
+  const [open, setOpen] = useState(false);
+  const [editProfile, setEditProfile] = useState(false);
+
+  useEffect(() => {
+    setEditProfile(!user?.name);
+  }, [user]);
+
   const handleOpen = () => {
     setOpen(true);
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
-  }
+  };
 
   const handleCloseEdit = () => {
     setEditProfile(false);
-  }
-  
+  };
+
   return (
     <div>
-      <Grid container spacing={2} height={'100vh'}>
+      <Grid container spacing={2} height={"100vh"}>
         <Grid item xs={2}>
-          <Sidebar openCourseDialog={handleOpen}/>
+          <Sidebar openCourseDialog={handleOpen} />
         </Grid>
         <Grid item xs={10}>
-          <Nav/>
+          <Nav />
           <Lectures />
           <Tests />
         </Grid>
       </Grid>
-      <AddCourseDialog open={open} handleClose={handleClose}/>
-      <CreateProfile open={editProfile} handleClose={handleCloseEdit}/>
+      <AddCourseDialog open={open} handleClose={handleClose} />
+      <CreateProfile open={editProfile} handleClose={handleCloseEdit} />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

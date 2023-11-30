@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 // // constants
 // import { BASE } from "./constants/endpoints";
 // components
@@ -25,21 +25,20 @@ import CreateProfile from "./components/CreateProfile";
 // const socket = io(BASE);
 
 const App = () => {
-
   const { token } = useContext(useGlobalContext);
 
   return (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={token ? <Home /> : <Navigate to='/auth/login' />}/>
-          <Route path='/live/:lectureId' element={<LiveStream/>}/>
-          <Route path='/test/:testId' element={<Test />}/>
-          <Route path='/create-profile' element={<CreateProfile />}/>
+          <Route path="/" element={token ? <Home /> : <Navigate to="/auth/login" />} />
+          <Route path="/live/:lectureId" element={<LiveStream />} />
+          <Route path="/test/:testId" element={<Test />} />
+          <Route path="/create-profile" element={<CreateProfile />} />
           {/* <Route exact path='/' element={<Home />} /> */}
           {/* <Route exact path="/calendar" element={<Calendar />} />
           <Route exact path="/profile" element={<Profile />} /> */}
-          <Route exact path="/auth/login" element={<LoginSignup/>} />
+          <Route exact path="/auth/login" element={!token ? <LoginSignup /> : <Navigate to="/" />} />
           {/* <Route exact path="/help" element={<Help/>} />
           <Route exact path="/privacy" element={<Privacy/>} />
           <Route exact path="/term" element={<Terms/>} />

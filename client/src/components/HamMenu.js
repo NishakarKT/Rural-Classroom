@@ -1,7 +1,8 @@
-import { IconButton, Menu, MenuItem } from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu';
-import React, { useContext } from 'react'
-import { useGlobalContext } from '../hooks/useGlobalContext';
+import { IconButton, Menu, MenuItem } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import React, { useContext } from "react";
+import { useGlobalContext } from "../hooks/useGlobalContext";
+import { LOCALSTORAGE } from "../constants/variables";
 
 const HamMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -12,24 +13,17 @@ const HamMenu = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const {setUser, setToken} = useContext(useGlobalContext);
+  const { setUser, setToken } = useContext(useGlobalContext);
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.removeItem(LOCALSTORAGE);
     setUser(null);
     setToken(null);
-  } 
-  
+  };
+
   return (
     <div>
-      <IconButton
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-      >
-        <MenuIcon fontSize='large'/>
+      <IconButton id="basic-button" aria-controls={open ? "basic-menu" : undefined} aria-haspopup="true" aria-expanded={open ? "true" : undefined} onClick={handleClick}>
+        <MenuIcon fontSize="large" />
       </IconButton>
       <Menu
         id="basic-menu"
@@ -37,7 +31,7 @@ const HamMenu = () => {
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          'aria-labelledby': 'basic-button',
+          "aria-labelledby": "basic-button",
         }}
       >
         <MenuItem onClick={handleClose}>Profile</MenuItem>
@@ -45,7 +39,7 @@ const HamMenu = () => {
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
-  )
-}
+  );
+};
 
-export default HamMenu
+export default HamMenu;
