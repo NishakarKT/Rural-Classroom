@@ -28,7 +28,7 @@ const Courses = () => {
         {courses &&
           courses.map((course) => (
             <Button variant="outlined" fullWidth>
-              {course}
+              {course.name}
             </Button>
           ))}
       </Box>

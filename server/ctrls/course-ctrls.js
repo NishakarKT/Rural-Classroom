@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Course } from "../models.js";
+import { Course, User } from "../models.js";
 
 export const get_course = async (req, res) => {
   try {
@@ -11,9 +11,11 @@ export const get_course = async (req, res) => {
       throw new Error("unauthorized");
     } else {
       // get courses
-      const query = req.query;
+      const query = JSON.parse(req.query.query) || {};
       // check if _id is present and convert it to ObjectId
-      if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+      if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
+      else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
+      console.log(query);
       const courses = await Course.find(query);
       res.status(200).send({ data: courses, message: "courses found" });
     }
@@ -33,13 +35,14 @@ export const new_course = async (req, res) => {
       throw new Error("unauthorized");
     } else {
       const data = req.body;
-      console.log(data);
       const result = await new Course(data).save({ new: true });
       // check if course created
       if (!result) {
         res.status(403);
         throw new Error("course not created");
       } else {
+        console.log(result);
+        await User.updateMany({ _id: user._id }, { $set: { courses: [...user.courses, result._id] } });
         res.status(201).send({ data: result, message: "course created" });
       }
     }
