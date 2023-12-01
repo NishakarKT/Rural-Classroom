@@ -45,7 +45,9 @@ export const otp_generate = async (req, res) => {
       // sending mail
       sendMail({ to: email, subject: "OTP verification | " + process.env.COMPANY, html: content })
         .then(() => res.status(200).send({ message: "OTP is sent", token }))
-        .catch((err) => {console.log(err); return res.status(424).send({ message: "OTP is not sent" });});
+        .catch((err) => {
+          return res.status(424).send({ message: "OTP is not sent" });
+        });
     }
   } catch (err) {
     if (res.statusCode < 400) res.status(500);
@@ -86,16 +88,15 @@ export const otp_verify = async (req, res) => {
             await Otp.deleteOne({ $or: [{ token }, { email }, { hashedOtp }] });
             // create user
             let user = await User.findOne({ email });
-            if(!user){
+            if (!user) {
               user = await new User({ email }).save();
             }
             // create token
-            const newToken = generateJWT({ email }, { expiresIn: "1d" });
+            const newToken = generateJWT({ email }, { expiresIn: "3d" });
             res.status(201).send({ message: "OTP is verified", isVerified: true, user, token: newToken });
           }
         } catch (err) {
           res.status(498);
-          console.log(err);
           throw new Error("OTP has expired, try refreshing");
         }
       }

@@ -11,9 +11,10 @@ export const get_test = async (req, res) => {
       throw new Error("unauthorized");
     } else {
       // get tests
-      const query = req.query;
+      const query = JSON.parse(req.query.query) || {};
       // check if _id is present and convert it to ObjectId
-      if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+      if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
+      else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
       const tests = await Test.find(query);
       res.status(200).send({ data: tests, message: "tests found" });
     }

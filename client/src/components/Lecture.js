@@ -1,20 +1,22 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Peer } from "peerjs";
 // constants
 import { BASE } from "../constants/endpoints";
 // components
 import Chart from "./Chart";
+import { useGlobalContext } from "../hooks/useGlobalContext";
 
-const user = { _id: "6524cdd255568cea7c54eb10" };
-const lectureId = "652521e3c889daf0886d4678";
 const socket = io(BASE);
 
 const LiveStream = () => {
-  const [role, setRole] = useState("coordinator");
+  const { lectureId } = useParams();
+  const { user } = useContext(useGlobalContext);
   const myStreamRef = useRef(null);
   const peerStreamRef = useRef(null);
   const [text, setText] = useState("");
+  const [refresh, setRefresh] = useState(false);
   const [messages, setMessages] = useState([]);
   const [doubts, setDoubts] = useState(0);
   const [chartData, setChartData] = useState([]);
@@ -27,46 +29,50 @@ const LiveStream = () => {
       setMessages((messages) => [...messages, { from, text, date }]);
     });
     // my stream
-    window.navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
-      if (myStreamRef.current) {
-        myStreamRef.current.srcObject = stream;
-        // set up peer for receiving livestream
-        const peer = new Peer();
-        socket.on("stream", ({ peerId }) => {
-          if (peerId) {
-            const call = peer.call(peerId, stream);
-            call.on("stream", (peerStream) => {
-              if (peerStreamRef.current) {
-                peerStreamRef.current.srcObject = peerStream;
-              }
+    if (user?._id) {
+      window.navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+        if (myStreamRef.current) {
+          myStreamRef.current.srcObject = stream;
+          // set up peer for receiving livestream
+          const peer = new Peer();
+          socket.on("stream", ({ peerId }) => {
+            if (peerId) {
+              const call = peer.call(peerId, stream);
+              call.on("stream", (peerStream) => {
+                console.log("on stream")
+                if (peerStreamRef.current) {
+                  peerStreamRef.current.srcObject = peerStream;
+                }
+              });
+            }
+          });
+          // set up peer for sending livestream
+          if (user?.role === "teacher") {
+            const peer = new Peer();
+            peer.on("open", (id) => {
+              console.log("teacher")
+              socket.emit("stream", { room: lectureId, peerId: id });
+            });
+            peer.on("call", (call) => {
+              call.answer(stream);
+              call.on("stream", (peerStream) => {
+                console.log("peer stream");
+                if (peerStreamRef.current) {
+                  peerStreamRef.current.srcObject = peerStream;
+                }
+              });
             });
           }
-        });
-        // set up peer for sending livestream
-        if (role === "teacher") {
-          const peer = new Peer();
-          peer.on("open", (id) => {
-            socket.emit("stream", { room: lectureId, peerId: id });
-          });
-          peer.on("call", (call) => {
-            call.answer(stream);
-            call.on("stream", (peerStream) => {
-              console.log("peer stream");
-              if (peerStreamRef.current) {
-                peerStreamRef.current.srcObject = peerStream;
-              }
-            });
-          });
+          // join room
+          socket.emit("join", { room: lectureId });
         }
-        // join room
-        socket.emit("join", { room: lectureId });
-      }
-    });
+      });
+    }
     // reset
     return () => {
       socket.off();
     };
-  }, [role]);
+  }, [user, refresh]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -92,14 +98,19 @@ const LiveStream = () => {
         <h1>Live Stream</h1>
         <div>
           <div style={{ display: "flex" }}>
-            <div>
-              <p>Teacher</p>
-              <video ref={peerStreamRef} autoPlay style={{ width: "200px", height: "200px", objectFit: "cover" }} />
-            </div>
-            <div>
-              <p>Me</p>
-              <video ref={myStreamRef} autoPlay muted style={{ width: "100px", height: "100px", objectFit: "cover" }} />
-            </div>
+            {user?.role ? (
+              <div>
+                <button onClick={() => setRefresh((refresh) => !refresh)}>Refresh</button>
+                <p>Teacher</p>
+                <video ref={peerStreamRef} autoPlay style={{ width: "200px", height: "200px", objectFit: "cover" }} />
+              </div>
+            ) : null}
+            {user?.role ? (
+              <div>
+                <p>Me</p>
+                <video ref={myStreamRef} autoPlay muted style={{ width: "100px", height: "100px", objectFit: "cover" }} />
+              </div>
+            ) : null}
           </div>
           <p>Doubts</p>
           <div style={{ width: "100%", height: "300px" }}>
@@ -120,7 +131,6 @@ const LiveStream = () => {
         </div>
         <input type="text" onChange={(e) => setText(e.target.value)} />
         <button onClick={() => handleMessages()}>Send</button>
-        <button onClick={() => setRole((role) => (role === "coordinator" ? "teacher" : "coordinator"))}>{role}</button>
         <br />
         <input type="number" placeholder="Doubts" value={doubts} onChange={(e) => setDoubts(e.target.value)} />
         <button onClick={handleDoubts}>Doubts</button>

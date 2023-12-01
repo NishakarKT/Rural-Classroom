@@ -10,9 +10,11 @@ export const get_notification = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      const query = req.query;
+      // get notifications
+      const query = JSON.parse(req.query.query) || {};
       // check if _id is present and convert it to ObjectId
-      if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+      if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
+      else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
       const notifications = await Notification.find(query);
       res.status(200).send({ data: notifications, message: "notifications found" });
     }

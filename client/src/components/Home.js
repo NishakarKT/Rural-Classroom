@@ -15,7 +15,7 @@ const Home = () => {
   const [editProfile, setEditProfile] = useState(false);
 
   useEffect(() => {
-    setEditProfile(!user?.name);
+    if (user?._id) setEditProfile(!user?.name);
   }, [user]);
 
   const handleOpen = () => {

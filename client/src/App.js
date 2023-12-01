@@ -3,9 +3,10 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 // // constants
 // import { BASE } from "./constants/endpoints";
 // components
-import LiveStream from "./components/LiveStream";
+import Lecture from "./components/Lecture";
 import Home from "./components/Home";
 // import Home from "./pages/Home";
+import Course from "./components/Course";
 import Test from "./components/Test";
 // import Calendar from "./components/layout/Calendar";
 // import Profile from "./pages/Profile";
@@ -25,20 +26,21 @@ import CreateProfile from "./components/CreateProfile";
 // const socket = io(BASE);
 
 const App = () => {
-  const { token } = useContext(useGlobalContext);
+  const { user } = useContext(useGlobalContext);
 
   return (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={token ? <Home /> : <Navigate to="/auth/login" />} />
-          <Route path="/live/:lectureId" element={<LiveStream />} />
+          <Route path="/" element={user?._id ? <Home /> : <Navigate to="/auth/login" />} />
           <Route path="/test/:testId" element={<Test />} />
+          <Route path="/course/:courseId" element={<Course />} />
+          <Route path="/lecture/:lectureId" element={<Lecture />} />
           <Route path="/create-profile" element={<CreateProfile />} />
           {/* <Route exact path='/' element={<Home />} /> */}
           {/* <Route exact path="/calendar" element={<Calendar />} />
           <Route exact path="/profile" element={<Profile />} /> */}
-          <Route exact path="/auth/login" element={!token ? <LoginSignup /> : <Navigate to="/" />} />
+          <Route exact path="/auth/login" element={!user?._id ? <LoginSignup /> : <Navigate to="/" />} />
           {/* <Route exact path="/help" element={<Help/>} />
           <Route exact path="/privacy" element={<Privacy/>} />
           <Route exact path="/term" element={<Terms/>} />

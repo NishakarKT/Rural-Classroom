@@ -1,8 +1,10 @@
 import { Box, Button, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import React, { useContext } from "react";
 import { useGlobalContext } from "../hooks/useGlobalContext";
 
 const Courses = () => {
+  const navigate= useNavigate();
   const { userRole, courses } = useContext(useGlobalContext);
 
   return (
@@ -27,7 +29,7 @@ const Courses = () => {
       >
         {courses &&
           courses.map((course) => (
-            <Button variant="outlined" fullWidth>
+            <Button onClick={() => navigate("/course/" + course._id)} variant="outlined" fullWidth>
               {course.name}
             </Button>
           ))}

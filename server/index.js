@@ -44,6 +44,7 @@ io.on("connection", (socket) => {
   });
   // handle stream
   socket.on("stream", ({ room, peerId }) => {
+    console.log(room, peerId)
     io.to(room).emit("stream", { peerId });
   });
   // handle disconnects
