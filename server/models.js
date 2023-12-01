@@ -88,6 +88,7 @@ const lectureSchema = new mongoose.Schema(
     description: { type: String },
     course: { type: String, required: true }, // course _id
     thumbnail: { type: String }, // path to file
+    url: { type: String }, // path to stream
   },
   { timestamps: true }
 );

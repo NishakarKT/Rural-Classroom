@@ -62,7 +62,8 @@ export const edit_notification = async (req, res) => {
       const { query, edits } = req.body;
       if (query) {
         // check if _id is present and convert it to ObjectId
-        if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+        if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
+        else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
         const result = await Notification.updateMany(query, edits, { new: true });
         // check if notification updated
         if (!result) {
@@ -95,7 +96,8 @@ export const delete_notification = async (req, res) => {
       const { query } = req.body;
       if (query) {
         // check if _id is present and convert it to ObjectId
-        if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+        if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
+        else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
         const result = await Notification.deleteMany(query);
         // check if notification deleted
         if (!result) {

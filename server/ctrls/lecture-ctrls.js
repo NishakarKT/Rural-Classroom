@@ -61,8 +61,10 @@ export const edit_lecture = async (req, res) => {
       // update users
       const { query, edits } = req.body;
       if (query) {
+        // get lectures
         // check if _id is present and convert it to ObjectId
-        if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+        if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
+        else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
         const result = await Lecture.updateMany(query, edits, { new: true });
         // check if lecture updated
         if (!result) {
@@ -95,7 +97,8 @@ export const delete_lecture = async (req, res) => {
       const { query } = req.body;
       if (query) {
         // check if _id is present and convert it to ObjectId
-        if (query._id) query._id = new mongoose.Types.ObjectId(query._id);
+        if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
+        else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
         const result = await Lecture.deleteMany(query);
         // check if lecture deleted
         if (!result) {
