@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
 // set up static files
-app.use(express.static("uploads"));
+app.use("/uploads",express.static("uploads"));
 
 // set up routes
 app.use("/", Router);
