@@ -15,6 +15,9 @@ import * as lectureCtrls from "./ctrls/lecture-ctrls.js";
 import * as attendanceCtrls from "./ctrls/attendance-ctrls.js";
 import * as calendarCtrls from "./ctrls/calendar-ctrls.js";
 import * as performanceCtrls from "./ctrls/performance-ctrls.js";
+import * as questionCtrls from "./ctrls/question-ctrls.js";
+import * as responseCtrls from "./ctrls/response-ctrls.js";
+import * as materialCtrls from "./ctrls/material-ctrls.js";
 
 const Router = express.Router();
 
@@ -61,6 +64,22 @@ Router.get("/attendance/get", isAuthenticated, attendanceCtrls.get_attendance);
 Router.post("/attendance/new", isAuthenticated, attendanceCtrls.new_attendance);
 Router.patch("/attendance/edit", isAuthenticated, attendanceCtrls.edit_attendance);
 Router.delete("/attendance/delete", isAuthenticated, attendanceCtrls.delete_attendance);
+// Question Routes
+Router.get("/question/get", isAuthenticated, questionCtrls.get_question);
+Router.post("/question/new", isAuthenticated, questionCtrls.new_question);
+Router.patch("/question/edit", isAuthenticated, questionCtrls.edit_question);
+Router.delete("/question/delete", isAuthenticated, questionCtrls.delete_question);
+// Response Routes
+Router.get("/response/get", isAuthenticated, responseCtrls.get_response);
+Router.post("/response/new", isAuthenticated, responseCtrls.new_response);
+Router.post("/response/news", isAuthenticated, responseCtrls.new_responses);
+Router.patch("/response/edit", isAuthenticated, responseCtrls.edit_response);
+Router.delete("/response/delete", isAuthenticated, responseCtrls.delete_response);
+// Material Routes
+Router.get("/material/get", isAuthenticated, materialCtrls.get_material);
+Router.post("/material/new", isAuthenticated, materialCtrls.new_material);
+Router.patch("/material/edit", isAuthenticated, materialCtrls.edit_material);
+Router.delete("/material/delete", isAuthenticated, materialCtrls.delete_material);
 // Calendar Routes
 Router.get("/calendar/get", isAuthenticated, calendarCtrls.get_calendar);
 Router.post("/calendar/new", isAuthenticated, calendarCtrls.new_calendar);

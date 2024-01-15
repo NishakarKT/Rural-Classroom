@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 
 // set up static files
-app.use("/uploads",express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
 
 // set up routes
 app.use("/", Router);
@@ -39,12 +39,12 @@ io.on("connection", (socket) => {
     io.to(room).emit("doubts", { doubts, date: new Date().toISOString() });
   });
   // handle messages
-  socket.on("message", ({ room, from, text }) => {
-    io.to(room).emit("message", { from, text, date: new Date().toISOString() });
+  socket.on("message", ({ room, from, fromName, text }) => {
+    io.to(room).emit("message", { from, fromName, text, date: new Date().toISOString() });
   });
   // handle stream
   socket.on("stream", ({ room, peerId }) => {
-    console.log(room, peerId)
+    console.log(room, peerId);
     io.to(room).emit("stream", { peerId });
   });
   // handle disconnects

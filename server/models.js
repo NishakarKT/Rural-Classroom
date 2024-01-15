@@ -14,6 +14,12 @@ const userSchema = new mongoose.Schema(
     name: { type: String },
     email: { type: String, required: true, unique: true },
     contact: { type: String },
+    address1: { type: String },
+    address2: { type: String },
+    city: { type: String },
+    state: { type: String },
+    zip: { type: String },
+    country: { type: String },
     role: { type: String, default: "coordinator" },
     profilePic: { type: String }, // path to file
     coverPic: { type: String }, // path to file
@@ -35,12 +41,43 @@ const studentSchema = new mongoose.Schema(
 const courseSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    description: { type: String, required: true },
+    date: { type: String, required: true }, // ISO string
+    syllabus: { type: String, required: true },
     teacher: { type: String, required: true }, // teacher's _id
-    coordinators: [{ type: String, required: true }], // coordinator _ids
-    lectures: [{ type: String, required: true }], // lecture _ids
-    tests: [{ type: String, required: true }], // test _ids
-    materials: [{ type: String, required: true }], // path to files
-    picture: { type: String }, // path to file
+    coursePic: { type: String }, // path to file
+  },
+  { timestamps: true }
+);
+
+const questionSchema = new mongoose.Schema(
+  {
+    question: { type: String, required: true },
+    options: [
+      {
+        key: { type: String, required: true }, // A, 1, a, i, etc.
+        value: { type: String }, // option text
+      },
+    ],
+    answer: { type: String, required: true }, // key value of correct option
+  },
+  { timestamps: true }
+);
+
+const responseSchema = new mongoose.Schema(
+  {
+    student: { type: String, required: true }, // coordinator _id + "_" + roll number
+    question: { type: String, required: true }, // question _id
+    response: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+const materialSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    course: { type: String, required: true }, // course _id
+    files: [{ type: String, required: true }], // path to file
   },
   { timestamps: true }
 );
@@ -48,25 +85,13 @@ const courseSchema = new mongoose.Schema(
 const testSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    description: { type: String, required: true },
+    syllabus: { type: String, required: true },
+    teacher: { type: String, required: true }, // teacher's _id
     course: { type: String, required: true }, // course _id
-    questions: [
-      {
-        question: { type: String, required: true },
-        options: [
-          {
-            key: { type: String, required: true }, // A, 1, a, i, etc.
-            value: { type: String, required: true }, // option text
-          },
-        ],
-        answer: { type: String, required: true }, // key value of correct option
-        responses: [
-          {
-            id: { type: String, required: true }, // coordinator _id + "_" + roll number
-            response: { type: String, required: true }, // key value of option
-          },
-        ],
-      },
-    ],
+    date: { type: String, required: true }, // ISO string
+    testPic: { type: String }, // path to file
+    questions: [{ type: String, required: true }], // question _ids
   },
   { timestamps: true }
 );
@@ -83,11 +108,10 @@ const notificationSchema = new mongoose.Schema(
 
 const lectureSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    path: { type: String, required: true },
-    description: { type: String },
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    date: { type: String, required: true },
     course: { type: String, required: true }, // course _id
-    thumbnail: { type: String }, // path to file
     url: { type: String }, // path to stream
   },
   { timestamps: true }
@@ -95,8 +119,9 @@ const lectureSchema = new mongoose.Schema(
 
 const attendanceSchema = new mongoose.Schema(
   {
+    coordinator: { type: String, required: true }, // coordinator _id
     lecture: { type: String, required: true }, // lecture _id
-    present: [{ type: String, required: true }], // student _ids
+    attendance: [{ type: String, required: true }], // student _ids
   },
   { timestamps: true }
 );
@@ -108,8 +133,8 @@ const calendarSchema = new mongoose.Schema(
       {
         date: { type: String, required: true }, // date-time ISO string
         duration: { type: Number, required: true }, // duration in minutes
-      }
-    ]
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -122,8 +147,8 @@ const performanceSchema = new mongoose.Schema(
       {
         test: { type: String, required: true }, // test _id
         score: { type: Number, required: true }, // score in percentage
-      }
-    ]
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -138,3 +163,6 @@ export const Lecture = new mongoose.model("lecture", lectureSchema);
 export const Attendance = new mongoose.model("attendance", attendanceSchema);
 export const Calendar = new mongoose.model("calendar", calendarSchema);
 export const Performance = new mongoose.model("performance", performanceSchema);
+export const Question = new mongoose.model("question", questionSchema);
+export const Response = new mongoose.model("response", responseSchema);
+export const Material = new mongoose.model("material", materialSchema);

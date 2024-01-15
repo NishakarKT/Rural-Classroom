@@ -4,7 +4,6 @@ import { verifyJWT } from "../services/misc-services.js";
 export const isAuthenticated = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
-    req.token = authorization;
     if (authorization) {
       // fetch token
       const token = authorization.split(" ")[1];
