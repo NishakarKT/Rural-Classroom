@@ -21,6 +21,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Course = lazy(() => import("./pages/Course"));
 const Test = lazy(() => import("./pages/Test"));
 const Auth = lazy(() => import("./pages/Auth"));
+const AnalyticsTest = lazy(() => import("./pages/AnalyticsTest"));
 
 const Dashboard = () => {
   const [mode, setMode] = useState("light");
@@ -134,6 +135,7 @@ const Dashboard = () => {
                 {user ? (
                   <>
                     {!isProfileComplete(user) ? <Route path="/*" element={<Profile />} /> : null}
+                    <Route path="/analytics/test/:testId" element={<AnalyticsTest />} />
                     <Route path="/course/:courseId" element={<Course />} />
                     <Route path="/test/:testId" element={<Test />} />
                     <Route path="/profile/" element={<Profile />} />
