@@ -106,8 +106,6 @@ const Dashboard = () => {
     return false;
   };
 
-  console.log(user)
-
   const theme = createTheme({ palette: { mode } });
 
   return (

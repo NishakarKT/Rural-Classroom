@@ -108,7 +108,7 @@ const Test = () => {
           const responses = await getResponsesFromImage(imageBlob);
           setResponses(responses);
           if (testQuestion?._id) {
-            const processedResponses = responses.map((response) => ({ question: testQuestion._id, student: user?._id + "_" + response.roll, response: testQuestion.options.find((q) => q.key === response.response)?.value }));
+            const processedResponses = responses.map((response) => ({ test: testId, question: testQuestion._id, student: user?._id + "_" + response.roll, response: testQuestion.options.find((q) => q.key === response.response)?.value }));
             setResponses(processedResponses);
           }
           setIsLoading(false);

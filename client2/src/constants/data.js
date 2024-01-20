@@ -27,7 +27,7 @@ export const defaultCharts = [
     ],
   },
   {
-    title: "Line Chart",
+    title: "Area Chart",
     type: "area",
     x: "date",
     data: [
@@ -52,7 +52,7 @@ export const defaultCharts = [
     ],
   },
   {
-    title: "Line Chart",
+    title: "Bar Chart",
     type: "bar",
     x: "date",
     data: [

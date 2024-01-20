@@ -18,13 +18,14 @@ import * as performanceCtrls from "./ctrls/performance-ctrls.js";
 import * as questionCtrls from "./ctrls/question-ctrls.js";
 import * as responseCtrls from "./ctrls/response-ctrls.js";
 import * as materialCtrls from "./ctrls/material-ctrls.js";
+import * as analyticsCtrls from "./ctrls/analytics-ctrls.js";
 
 const Router = express.Router();
 
 // misc routes
 Router.get("/", miscCtrls.index);
 // file routes
-Router.post("/file/upload", isAuthenticated, upload.array('files'), fileCtrls.uploadFiles);
+Router.post("/file/upload", isAuthenticated, upload.array("files"), fileCtrls.uploadFiles);
 // Auth Routes
 Router.post("/auth/token", isAuthenticated, authCtrls.token);
 Router.post("/auth/email", authCtrls.email);
@@ -91,5 +92,8 @@ Router.get("/performance/get", isAuthenticated, performanceCtrls.get_performance
 Router.post("/performance/new", isAuthenticated, performanceCtrls.new_performance);
 Router.patch("/performance/edit", isAuthenticated, performanceCtrls.edit_performance);
 Router.delete("/performance/delete", isAuthenticated, performanceCtrls.delete_performance);
+Router.delete("/calendar/delete", isAuthenticated, calendarCtrls.delete_calendar);
+// Analytics Routes
+Router.get("/analytics/test", isAuthenticated, analyticsCtrls.get_test);
 
 export default Router;

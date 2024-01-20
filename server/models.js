@@ -59,7 +59,7 @@ const questionSchema = new mongoose.Schema(
         value: { type: String }, // option text
       },
     ],
-    answer: { type: String, required: true }, // key value of correct option
+    answer: { type: String, required: true }, // correct option
   },
   { timestamps: true }
 );
@@ -67,6 +67,7 @@ const questionSchema = new mongoose.Schema(
 const responseSchema = new mongoose.Schema(
   {
     student: { type: String, required: true }, // coordinator _id + "_" + roll number
+    test: { type: String, required: true }, // test _id
     question: { type: String, required: true }, // question _id
     response: { type: String, required: true },
   },
