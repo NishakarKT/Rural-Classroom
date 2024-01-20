@@ -27,6 +27,7 @@ Router.get("/", miscCtrls.index);
 Router.post("/file/upload", isAuthenticated, upload.array('files'), fileCtrls.uploadFiles);
 // Auth Routes
 Router.post("/auth/token", isAuthenticated, authCtrls.token);
+Router.post("/auth/email", authCtrls.email);
 Router.post("/auth/otp-generate", authCtrls.otp_generate);
 Router.post("/auth/otp-verify", authCtrls.otp_verify);
 // User Routes

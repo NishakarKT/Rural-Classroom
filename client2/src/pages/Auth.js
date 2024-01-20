@@ -14,12 +14,12 @@ import AppContext from "../contexts/AppContext";
 // constants
 import { COMPANY, COMPANY2, LOCALSTORAGE } from "../constants/vars";
 import { HOME_ROUTE } from "../constants/routes";
-import { AUTH_OTP_GENERATE_ENDPOINT, AUTH_OTP_VERIFY_ENDPOINT } from "../constants/endpoints";
+import { AUTH_OTP_GENERATE_ENDPOINT, AUTH_OTP_VERIFY_ENDPOINT, AUTH_EMAIL_ENDPOINT } from "../constants/endpoints";
 import { VIDEOS_AUTH_MP4 } from "../constants/videos";
 
 const AuthUser = () => {
   const navigate = useNavigate();
-  const { mode, setToken } = useContext(AppContext);
+  const { mode, setToken, setUser } = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isGglLoading, setIsGglLoading] = useState(false);
   const [emailErr, setEmailErr] = useState("");
@@ -31,33 +31,24 @@ const AuthUser = () => {
     auth
       .signInWithPopup(googleProvider)
       .then((res) => {
-        // const email = res.user.email;
-        console.log("verified Google");
-        // axios
-        //   .post(AUTH_IN_ENDPOINT, { email })
-        //   .then((res) => {
-        //     const { user, token } = res.data;
-        //     console.log(res.data);
-        //     // storing token
-        //     if (remMe) {
-        //       const localData = JSON.parse(localStorage.getItem(LOCALSTORAGE)) || {};
-        //       localStorage.setItem(LOCALSTORAGE, JSON.stringify({ ...localData, token }));
-        //     } else {
-        //       const localData = JSON.parse(localStorage.getItem(LOCALSTORAGE)) || {};
-        //       delete localData.token;
-        //       localStorage.setItem(LOCALSTORAGE, JSON.stringify(localData));
-        //     }
-        //     // setting user
-        //     setUser(user);
-        //     // back to home
-        //     navigate(HOME_ROUTE);
-        //     // resets
-        //     setIsGglLoading(false);
-        //   })
-        //   .catch((err) => {
-        //     console.log(err);
-        //     setIsGglLoading(false);
-        //   });
+        const email = res.user.email;
+        axios
+          .post(AUTH_EMAIL_ENDPOINT, { email })
+          .then((res) => {
+            const { token } = res.data;
+            // storing token
+            const localData = JSON.parse(localStorage.getItem(LOCALSTORAGE)) || {};
+            localStorage.setItem(LOCALSTORAGE, JSON.stringify({ ...localData, token }));
+            setToken(token);
+            // back to home
+            navigate(HOME_ROUTE);
+            // resets
+            setIsGglLoading(false);
+          })
+          .catch((err) => {
+            console.log(err);
+            setIsGglLoading(false);
+          });
       })
       .catch((err) => {
         console.log(err);

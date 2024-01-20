@@ -2,6 +2,7 @@ export const BASE = "http://localhost:8000";
 // file
 export const FILE_UPLOAD_ENDPOINT = BASE + "/file/upload";
 // auth
+export const AUTH_EMAIL_ENDPOINT = BASE + "/auth/email";
 export const AUTH_TOKEN_ENDPOINT = BASE + "/auth/token";
 export const AUTH_OTP_GENERATE_ENDPOINT = BASE + "/auth/otp-generate";
 export const AUTH_OTP_VERIFY_ENDPOINT = BASE + "/auth/otp-verify";

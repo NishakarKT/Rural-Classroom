@@ -6,6 +6,23 @@ import { templateToHTML } from "../services/mail-services.js";
 import { generateJWT, verifyJWT, generateHash, compareHash } from "../services/misc-services.js";
 import { handlebarsReplacements } from "../services/misc-services.js";
 
+export const email = async (req, res) => {
+  try {
+    const { email } = req.body;
+    // create user
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await new User({ email }).save();
+    }
+    // create token
+    const newToken = generateJWT({ email }, { expiresIn: "3d" });
+    res.status(201).send({ message: "user created/updated", user, token: newToken });
+  } catch (err) {
+    if (res.statusCode < 400) res.status(500);
+    res.send({ message: err.message || "something went wrong" });
+  }
+};
+
 export const token = async (req, res) => {
   try {
     const user = req.user;

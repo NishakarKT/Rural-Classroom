@@ -49,7 +49,7 @@ const Dashboard = () => {
         axios
           .post(AUTH_TOKEN_ENDPOINT, {}, { headers: { Authorization: `Bearer ${token}` } })
           .then((res) => {
-            const user = res.data.data || {};
+            const user = res.data.data;
             setUser(user);
           })
           .catch((err) => {
@@ -105,6 +105,8 @@ const Dashboard = () => {
     if (name && email) return true;
     return false;
   };
+
+  console.log(user)
 
   const theme = createTheme({ palette: { mode } });
 
