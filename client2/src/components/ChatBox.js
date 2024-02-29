@@ -6,6 +6,8 @@ import { speechToText } from "../apis/multimedia";
 import { Box, Stack, TextField, IconButton, CircularProgress } from "@mui/material";
 import { Mic, MicOff, Send } from "@mui/icons-material";
 import ChatMessage from "./ChatMessage";
+// vars
+const mimeType = "audio/webm;codecs=opus";
 
 const ChatBox = ({ messages, handleMessage }) => {
   const chatBoxRef = useRef(null);
@@ -22,7 +24,8 @@ const ChatBox = ({ messages, handleMessage }) => {
         setIsLoading(true);
         try {
           const mediaBlob = await fetch(mediaBlobUrl).then((r) => r.blob());
-          const text = await speechToText(mediaBlob);
+          const blobWithMimeType = new Blob([mediaBlob], { type: mimeType });
+          const text = await speechToText(blobWithMimeType);
           handleMessage(text);
           setIsLoading(false);
         } catch (err) {

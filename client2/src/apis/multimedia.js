@@ -1,16 +1,13 @@
 export const speechToText = async (blob) => {
-  //   const formData = new FormData();
-  //   formData.append("audio", blob);
-  //   const response = await fetch("https://speech-to-text-demo.ng.bluemix.net/api/v1/recognize", {
-  //     method: "POST",
-  //     body: formData,
-  //   });
-  //   const data = await response.json();
-  //   return data.results[0].alternatives[0].transcript;
-
-  // dummy 1 second response
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  return "This is a dummy response.";
+  const formData = new FormData();
+  formData.append("file", blob);
+  const response = await fetch("https://btp-backend-n3xs.onrender.com/transcribe", {
+    method: "POST",
+    body: formData,
+  });
+  const data = await response.json();
+  console.log(data);
+  return data.detail;
 };
 
 export const getDoubtsFromImage = async (blob) => {

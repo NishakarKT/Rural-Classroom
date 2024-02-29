@@ -233,7 +233,7 @@ const Course = () => {
   };
 
   const handleMessage = (e) => {
-    if (e.preventDefault) {
+    if (e?.preventDefault) {
       e.preventDefault();
       const text = e.target.text.value;
       socket.emit("message", { room: courseId, from: user._id, fromName: user.name, text });

@@ -41,10 +41,10 @@ const CourseCard = ({ course }) => {
 
   return (
     <Card sx={{ maxWidth: "325px" }}>
-      <CardHeader avatar={<Avatar src={UPLOAD_URL + teacher?.profilePic}>{teacher?.name || "Teacher"}</Avatar>} align="left" title={course.name} subheader={new Date(course.date).toLocaleString()} />
+      <CardHeader avatar={<Avatar src={UPLOAD_URL + teacher?.profilePic}>{teacher?.name ? teacher.name[0] : "T"}</Avatar>} align="left" title={course.name} subheader={new Date(course.date).toLocaleString()} />
       <CardMedia component="img" height="194" image={UPLOAD_URL + course.coursePic} alt={course.name} />
       <CardContent>
-      <Typography variant="body2" color="text.secondary" align="left" mb={2}>
+        <Typography variant="body2" color="text.secondary" align="left" mb={2}>
           {truncate(course.description, 175)}
         </Typography>
         <Typography variant="body2" color="text.primary" align="right">

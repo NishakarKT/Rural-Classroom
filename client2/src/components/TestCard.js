@@ -41,7 +41,7 @@ const TestCard = ({ test }) => {
 
   return (
     <Card sx={{ maxWidth: "325px" }}>
-      <CardHeader avatar={<Avatar src={UPLOAD_URL + teacher?.profilePic}>{teacher?.name || "Teacher"}</Avatar>} align="left" title={test.name} subheader={new Date(test.date).toLocaleString()} />
+      <CardHeader avatar={<Avatar src={UPLOAD_URL + teacher?.profilePic}>{teacher?.name ? teacher?.name[0] : "T"}</Avatar>} align="left" title={test.name} subheader={new Date(test.date).toLocaleString()} />
       <CardMedia component="img" height="194" image={UPLOAD_URL + test.testPic} alt={test.name} />
       <CardContent>
       <Typography variant="body2" color="text.secondary" align="left" mb={2}>
