@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 // constants
-import { AUTH_ROUTE, HOME_ROUTE } from "../constants/routes";
+import { ADMIN_ROUTE, AUTH_ROUTE, HOME_ROUTE } from "../constants/routes";
 // contexts
 import AppContext from "../contexts/AppContext";
 // mui
 import { Drawer as MuiDrawer, Toolbar, List, ListItemIcon, ListItemText, ListItemButton, Divider, IconButton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import styled from "@mui/material/styles/styled";
-import { Home, ChevronLeft, AccountCircle } from "@mui/icons-material";
+import { Home, ChevronLeft, AccountCircle, AdminPanelSettings } from "@mui/icons-material";
 // vars
 const drawerWidth = 240;
 
@@ -69,11 +69,21 @@ const SideBar = ({ open, toggleDrawer }) => {
           </>
         ) : (
           <>
-            <ListItemButton onClick={() => navigate(AUTH_ROUTE)}>
+            <ListItemButton onClick={() => navigate(AUTH_ROUTE)} sx={{ backgroundColor: (location.pathname === AUTH_ROUTE ? theme.palette.primary.main : "") + " !important" }}>
               <ListItemIcon>
                 <AccountCircle />
               </ListItemIcon>
               <ListItemText primary="Auth" />
+            </ListItemButton>
+          </>
+        )}
+        {user && user.role==='admin' && (
+          <>
+            <ListItemButton onClick={() => navigate(ADMIN_ROUTE)}>
+              <ListItemIcon>
+                <AdminPanelSettings />
+              </ListItemIcon>
+              <ListItemText primary="Admin panel" />
             </ListItemButton>
           </>
         )}

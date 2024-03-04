@@ -26,6 +26,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
+    "react-virtuoso": "^4.7.1",
     "react-webcam": "^7.2.0",
     "recharts": "^2.10.4",
     "recharts-to-png": "^2.3.0",

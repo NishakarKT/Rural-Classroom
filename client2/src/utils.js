@@ -1,5 +1,5 @@
 export const truncate = (str, len) => {
-  if (str.length > len) {
+  if (str && str.length > len) {
     return str.substring(0, len) + "...";
   } else {
     return str;
@@ -23,5 +23,13 @@ export const dataFormatter = (number) => {
   } else {
     return number.toString();
   }
+};
+
+export const formattedDate = (date) => {
+  const month = date.toLocaleString("default", { month: "short" });
+  const day = date.getDate();
+  const year = date.getFullYear();
+
+  return `${month} ${day}, ${year}`;
 };
 

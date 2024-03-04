@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Attendance } from "../models.js";
+import { Attendance, Course, Lecture, Student, User } from "../models.js";
 
 export const get_attendance = async (req, res) => {
   try {
@@ -16,9 +16,50 @@ export const get_attendance = async (req, res) => {
       if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
       else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
       const attendances = await Attendance.find(query);
-      res.status(200).send({ data: attendances, message: "attendances found" });
+      console.log(attendances);
+      const temp = await Promise.all(
+        attendances.map(async attendance => {
+          const coordinatorQuery =  {_id: new mongoose.Types.ObjectId(attendance.coordinator)};
+          const lectureQuery =  {_id: new mongoose.Types.ObjectId(attendance.lecture)};
+
+          const [coordinator] = await User.find(coordinatorQuery);
+          const [lecture] = await Lecture.find(lectureQuery);
+
+          const courseQuery = {_id: new mongoose.Types.ObjectId(lecture.course)};
+
+          const [course] = await Course.find(courseQuery);
+
+          const teacherQuery = {_id: new mongoose.Types.ObjectId(course.teacher)};
+
+          const [teacher] = await User.find(teacherQuery);
+          
+          const attendances = await Promise.all(
+            attendance.attendance.map(async student => {
+              const studentQuery = {_id: new mongoose.Types.ObjectId(student)};
+
+              const [getStudent] = await Student.find(studentQuery);
+              return getStudent;
+            })
+          )
+
+          return ({
+            ...attendance.toObject(),
+            coordinator,
+            lecture: {
+              ...lecture.toObject(),
+              course: {
+                ...course.toObject(),
+                teacher,
+              },
+            },
+            attendance: attendances,
+          })
+        })
+      )
+      res.status(200).send({ data: temp, message: "attendances found" });
     }
   } catch (err) {
+    console.log(err);
     if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }

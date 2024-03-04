@@ -175,7 +175,7 @@ const Home = () => {
               ) : null}
             </Stack>
             <Carousel showIndicators={false} showStatus={false} showThumbs={false}>
-              {courses.length ? (
+              {courses && courses.length ? (
                 courses
                   .filter((c, i) => i % 4 === 0)
                   .map((course, index) => (
@@ -208,7 +208,7 @@ const Home = () => {
               ) : null}
             </Stack>
             <Carousel showIndicators={false} showStatus={false} showThumbs={false}>
-              {tests.length ? (
+              {tests && tests.length ? (
                 tests
                   .filter((c, i) => i % 4 === 0)
                   .map((test, index) => (
@@ -227,7 +227,7 @@ const Home = () => {
           </Paper>
         </Grid>
       </Grid>
-      <Dialog open={courseId} onClose={handleCloseCourse} TransitionComponent={Transition}>
+      <Dialog open={!!courseId} onClose={handleCloseCourse} TransitionComponent={Transition}>
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
             <Typography sx={{ flex: 1 }} variant="h6" component="div">
@@ -275,7 +275,7 @@ const Home = () => {
           </Grid>
         </form>
       </Dialog>
-      <Dialog open={testId} onClose={handleCloseTest} TransitionComponent={Transition}>
+      <Dialog open={!!testId} onClose={handleCloseTest} TransitionComponent={Transition}>
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
             <Typography sx={{ flex: 1 }} variant="h6" component="div">
