@@ -49,7 +49,7 @@ const Performance = () => {
       setPerformance(data.current);
     }
   };
-  console.log(performance);
+
   return (
     <>
       <AdminHeader

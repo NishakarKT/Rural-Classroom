@@ -16,7 +16,7 @@ export const get_attendance = async (req, res) => {
       if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
       else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
       const attendances = await Attendance.find(query);
-      console.log(attendances);
+
       const temp = await Promise.all(
         attendances.map(async attendance => {
           const coordinatorQuery =  {_id: new mongoose.Types.ObjectId(attendance.coordinator)};
@@ -59,7 +59,6 @@ export const get_attendance = async (req, res) => {
       res.status(200).send({ data: temp, message: "attendances found" });
     }
   } catch (err) {
-    console.log(err);
     if (res.statusCode < 400) res.status(500);
     res.send({ message: err.message || "something went wrong" });
   }
