@@ -26,6 +26,7 @@ const AnalyticsTest = lazy(() => import("./pages/AnalyticsTest"));
 const AdminStudents = lazy(() => import ("./pages/admin/students/index"));
 const AdminPerformance = lazy(() => import ("./pages/admin/performance/index"));
 const AdminAttendance = lazy(() => import ("./pages/admin/attendance/index"));
+const AdminFees = lazy(() => import ("./pages/admin/fees/index"));
 
 const Dashboard = () => {
   const [mode, setMode] = useState("light");
@@ -174,6 +175,13 @@ const Dashboard = () => {
                       path="/admin/attendance"
                       element={
                         <AdminAttendance/>
+                      }
+                    />
+
+                    <Route
+                      path="/admin/fees"
+                      element={
+                        <AdminFees/>
                       }
                     />
 
