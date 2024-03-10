@@ -23,10 +23,10 @@ const Course = lazy(() => import("./pages/Course"));
 const Test = lazy(() => import("./pages/Test"));
 const Auth = lazy(() => import("./pages/Auth"));
 const AnalyticsTest = lazy(() => import("./pages/AnalyticsTest"));
-const AdminStudents = lazy(() => import ("./pages/admin/students/index"));
-const AdminPerformance = lazy(() => import ("./pages/admin/performance/index"));
-const AdminAttendance = lazy(() => import ("./pages/admin/attendance/index"));
-const AdminFees = lazy(() => import ("./pages/admin/fees/index"));
+const AdminStudents = lazy(() => import("./pages/admin/students/index"));
+const AdminPerformance = lazy(() => import("./pages/admin/performance/index"));
+const AdminAttendance = lazy(() => import("./pages/admin/attendance/index"));
+const AdminFees = lazy(() => import("./pages/admin/fees/index"));
 
 const Dashboard = () => {
   const [mode, setMode] = useState("light");
@@ -35,19 +35,19 @@ const Dashboard = () => {
   const [courses, setCourses] = useState([]);
   const [tests, setTests] = useState([]);
   const [open, setOpen] = useState(false);
-  const [showAdminSideBar, setShowAdminSideBar]= useState(false);
+  const [showAdminSideBar, setShowAdminSideBar] = useState(false);
   const location = useLocation();
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  useEffect(()=>{
-    if(location.pathname.includes('/admin')){
-      setShowAdminSideBar(true)
+  useEffect(() => {
+    if (location.pathname.includes("/admin")) {
+      setShowAdminSideBar(true);
     } else {
       setShowAdminSideBar(false);
     }
-  },[location.pathname]);
+  }, [location.pathname]);
 
   useEffect(() => {
     const localData = JSON.parse(localStorage.getItem(LOCALSTORAGE)) || {};
@@ -132,8 +132,8 @@ const Dashboard = () => {
         </SpeedDial>
         <Box sx={{ display: "flex" }}>
           <NavBar open={open} toggleDrawer={toggleDrawer} />
-          {!showAdminSideBar && (<SideBar open={open} toggleDrawer={toggleDrawer} />)}
-          {showAdminSideBar && (<AdminSideBar open={open} toggleDrawer={toggleDrawer} />)}
+          {!showAdminSideBar && <SideBar open={open} toggleDrawer={toggleDrawer} />}
+          {showAdminSideBar && <AdminSideBar open={open} toggleDrawer={toggleDrawer} />}
           <Box
             component="main"
             sx={{
@@ -153,38 +153,12 @@ const Dashboard = () => {
                     <Route path="/course/:courseId" element={<Course />} />
                     <Route path="/test/:testId" element={<Test />} />
                     <Route path="/profile/" element={<Profile />} />
-
                     {/* admin routes */}
                     <Route path="/admin" element={<Navigate to="/admin/students" replace />} />
-
-                    <Route
-                      path="/admin/students"
-                      element={
-                        <AdminStudents />
-                      }
-                    />
-
-                    <Route
-                      path="/admin/performance"
-                      element={
-                        <AdminPerformance />
-                      }
-                    />
-
-                    <Route
-                      path="/admin/attendance"
-                      element={
-                        <AdminAttendance/>
-                      }
-                    />
-
-                    <Route
-                      path="/admin/fees"
-                      element={
-                        <AdminFees/>
-                      }
-                    />
-
+                    <Route path="/admin/students" element={<AdminStudents />} />
+                    <Route path="/admin/performance" element={<AdminPerformance />} />
+                    <Route path="/admin/attendance" element={<AdminAttendance />} />
+                    <Route path="/admin/fees" element={<AdminFees />} />
                     <Route path="/*" element={<Home />} />
                   </>
                 ) : (

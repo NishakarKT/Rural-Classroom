@@ -34,7 +34,6 @@ export const new_lecture = async (req, res) => {
     } else {
       // create lecture
       const data = req.body;
-      console.log(data)
       const result = await new Lecture(data).save({ new: true });
       // check if lecture created
       if (!result) {

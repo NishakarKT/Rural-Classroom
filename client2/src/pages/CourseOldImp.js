@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Helmet } from "react-helmet";
 import { io } from "socket.io-client";
+import { Peer } from "peerjs";
 import Draggable from "react-draggable";
+import { useReactMediaRecorder } from "react-media-recorder";
 import Webcam from "react-webcam";
-import YouTube from "react-youtube";
 // contexts
 import AppContext from "../contexts/AppContext";
 // components
@@ -22,8 +23,9 @@ import { getDoubtsFromImage, getAttendanceFromImage } from "../apis/multimedia";
 // mui
 import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Tooltip, Badge, IconButton, TextField, ListItemButton } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { VideoCall, Close, Camera, Refresh, Add, FileCopy } from "@mui/icons-material";
+import { VideoCall, Videocam, VideocamOff, Save, Close, Camera, Refresh, Add, FileCopy } from "@mui/icons-material";
 // vars
+let varStream;
 const socket = io(BASE);
 
 function PaperComponent(props) {
@@ -46,13 +48,18 @@ const Course = () => {
   const [lecture, setLecture] = useState(null);
   const [lectures, setLectures] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLive, setIsLive] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const [messages, setMessages] = useState([]);
   const [doubts, setDoubts] = useState(0);
   const [chartData, setChartData] = useState([]);
   const [capturedImage, setCapturedImage] = useState(null);
   const [materials, setMaterials] = useState([]);
   const [materialFiles, setMaterialsFiles] = useState([]);
+  const [recording, setRecording] = useState(null);
+  const [recordings, setRecordings] = useState([]);
   const [attendance, setAttendance] = useState([]);
+  const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ video: true, audio: true });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -93,8 +100,8 @@ const Course = () => {
           .get(LECTURE_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
           .then((res) => {
             if (res.data.data.length) {
-              setLecture(res.data.data[0]);
-              setLectures(res.data.data.reverse());
+              setLecture(null);
+              setLectures(res.data.data);
             } else {
               setLecture(null);
               setLectures([]);
@@ -139,13 +146,62 @@ const Course = () => {
     socket.on("message", ({ from, fromName, text, date }) => {
       setMessages((messages) => [...messages, { from, fromName, text, date }]);
     });
+    // my stream
+    if (user?._id && isLive) {
+      window.navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+        varStream = stream;
+        if (myStreamRef.current) {
+          console.log("my stream");
+          myStreamRef.current.srcObject = stream;
+          // set up peer for receiving livestream
+          const peer = new Peer();
+          socket.on("stream", ({ peerId }) => {
+            console.log("stream");
+            if (peerId) {
+              const call = peer.call(peerId, stream);
+              call.on("stream", (peerStream) => {
+                console.log("on stream");
+                if (peerStreamRef.current) {
+                  peerStreamRef.current.srcObject = peerStream;
+                }
+              });
+            }
+          });
+          // set up peer for sending livestream
+          if (user?.role === "teacher") {
+            const peer = new Peer();
+            peer.on("open", (id) => {
+              console.log("teacher stream");
+              socket.emit("stream", { room: courseId, peerId: id });
+            });
+            peer.on("call", (call) => {
+              call.answer(stream);
+              call.on("stream", (peerStream) => {
+                console.log("teacher peer stream");
+                if (peerStreamRef.current) {
+                  peerStreamRef.current.srcObject = peerStream;
+                }
+              });
+            });
+          }
+        }
+      });
+    }
     // join room
     socket.emit("join", { room: courseId });
     // reset
     return () => {
       socket.off();
     };
-  }, [user]);
+  }, [user, isLive, refresh]);
+
+  useEffect(() => {
+    if (mediaBlobUrl) {
+      const recording = { title: "Recording - " + (recordings.length + 1), url: mediaBlobUrl, date: new Date().toISOString() };
+      setRecording(recording);
+      setRecordings((recordings) => [recording, ...recordings]);
+    }
+  }, [mediaBlobUrl]);
 
   useEffect(() => {
     (async () => {
@@ -165,6 +221,10 @@ const Course = () => {
       }
     })();
   }, [capturedImage]);
+
+  const endMediaDevices = async () => {
+    if (varStream) varStream.getTracks().forEach((track) => track.stop());
+  };
 
   const captureImage = () => {
     const capturedImage = myStreamRef.current.getScreenshot();
@@ -187,29 +247,52 @@ const Course = () => {
 
   const handleLecture = async (e) => {
     e.preventDefault();
-    const edits = {};
-    new FormData(e.target).forEach((value, key) => (edits[key] = value)); // FormData to JS object
-    edits["course"] = courseId;
-    edits["date"] = new Date().toISOString();
-    try {
-      setIsLoading(true);
-      axios
-        .post(LECTURE_NEW_ENDPOINT, edits, { headers: { Authorization: `Bearer ${token}` } })
-        .then((res) => {
-          alert("Your lecture has been uploaded!");
-          setLectures((lectures) => [res.data.data, ...lectures]);
-          setLectureOpen(false);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          alert("Your lecture has NOT been updated!");
-          setLectureOpen(false);
-          setIsLoading(false);
+    if (recording) {
+      const edits = {};
+      new FormData(e.target).forEach((value, key) => (edits[key] = value)); // FormData to JS object
+      const mediaBlob = await fetch(recording.url).then((r) => r.blob());
+      const formData = new FormData();
+      const fileName = user.role + "." + user.email + ".lecture." + edits.name + ".mp4";
+      formData.append("files", mediaBlob, fileName);
+      await fetch(FILE_UPLOAD_ENDPOINT, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const url = Object.values(data.data)[0];
+          if (url) {
+            edits["url"] = fileName;
+            edits["course"] = courseId;
+            edits["date"] = new Date().toISOString();
+            try {
+              setIsLoading(true);
+              axios
+                .post(LECTURE_NEW_ENDPOINT, edits, { headers: { Authorization: `Bearer ${token}` } })
+                .then((res) => {
+                  alert("Your lecture has been uploaded!");
+                  setLectures((lectures) => [res.data.data, ...lectures]);
+                  setLectureOpen(false);
+                  setRecording(null);
+                  setIsLoading(false);
+                })
+                .catch((err) => {
+                  alert("Your lecture has NOT been updated!");
+                  setLectureOpen(false);
+                  setRecording(null);
+                  setIsLoading(false);
+                });
+            } catch (err) {
+              alert("Your lecture has NOT been updated!");
+              setLectureOpen(false);
+              setRecording(null);
+              setIsLoading(false);
+            }
+          }
         });
-    } catch (err) {
-      alert("Your lecture has NOT been updated!");
-      setLectureOpen(false);
-      setIsLoading(false);
     }
   };
 
@@ -274,6 +357,7 @@ const Course = () => {
 
   const handleAttendance = async () => {
     if (lecture?._id && attendance?.length) {
+      console.log(attendance);
       try {
         axios
           .post(ATTENDANCE_NEW_ENDPOINT, { coordinator: user?._id, lecture: lecture._id, attendance }, { headers: { Authorization: `Bearer ${token}` } })
@@ -311,38 +395,52 @@ const Course = () => {
                     Live Class
                   </Typography>
                   {user?.role === "teacher" ? (
-                    <Button
-                      variant="contained"
-                      color={"primary"}
-                      startIcon={<VideoCall />}
-                      onClick={() => {
-                        setLectureOpen(true);
-                      }}
-                    >
-                      New Lecture
+                    <Button disabled={!isLive} color={status === "idle" || status === "stopped" ? "success" : "error"} variant="outlined" startIcon={status === "idle" || status === "stopped" ? <Videocam /> : <VideocamOff />} onClick={() => (status === "idle" || status === "stopped" ? startRecording() : stopRecording())}>
+                      {status === "idle" || status === "stopped" ? "Start" : "Stop"}
                     </Button>
                   ) : null}
+                  {user?.role === "teacher" ? (
+                    <Button
+                      variant="contained"
+                      color={!isLive ? "primary" : "error"}
+                      startIcon={<VideoCall />}
+                      onClick={() => {
+                        if (!isLive) {
+                          setIsLive(true);
+                          setLecture(null);
+                        } else {
+                          setIsLive(false);
+                          setLecture(null);
+                          endMediaDevices();
+                        }
+                      }}
+                    >
+                      {!isLive ? "Go Live" : "Disconnect"}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color={!isLive ? "primary" : "error"}
+                      startIcon={<VideoCall />}
+                      onClick={() => {
+                        if (!isLive) {
+                          setIsLive(true);
+                          setLecture(null);
+                        } else {
+                          setIsLive(false);
+                          setLecture(null);
+                          endMediaDevices();
+                        }
+                      }}
+                    >
+                      {!isLive ? "Join Class" : "Disconnect"}
+                    </Button>
+                  )}
                 </Stack>
-                <Stack direction="row" alignItems="center" sx={{ position: "relative" }}>
-                  {lecture ? (
-                    <YouTube
-                      style={{
-                        position: "absolute",
-                        zIndex: 1,
-                        width: "100%",
-                      }}
-                      videoId={lecture.youtubeId}
-                      opts={{
-                        height: "300",
-                        width: "100%",
-                        playerVars: {
-                          autoplay: 1,
-                        },
-                      }}
-                    />
-                  ) : null}
-                  {user?.role === "teacher" ? <video autoPlay muted ref={myStreamRef} style={{ width: "100%", height: "300px", objectFit: "cover", borderRadius: "5px" }} /> : null}
-                  {user?.role !== "teacher" ? <video autoPlay ref={peerStreamRef} style={{ width: "100%", height: "300px", objectFit: "cover", borderRadius: "5px" }} /> : null}
+                <Stack direction="row" alignItems="center">
+                  {!isLive && lecture ? <video src={UPLOAD_URL + lecture.url} controls style={{ width: "100%", height: "300px", objectFit: "cover", borderRadius: "5px" }} /> : null}
+                  {isLive && user?.role === "teacher" ? <video autoPlay muted ref={myStreamRef} style={{ width: "100%", height: "300px", objectFit: "cover", borderRadius: "5px" }} /> : null}
+                  {isLive && user?.role !== "teacher" ? <video autoPlay ref={peerStreamRef} style={{ width: "100%", height: "300px", objectFit: "cover", borderRadius: "5px" }} /> : null}
                   {user?.role !== "teacher" ? (
                     <div style={{ position: "fixed", zIndex: 9999, bottom: 16, right: 16, borderRadius: "5px", overflow: "hidden" }}>
                       <div style={{ position: "relative", height: "200px", width: "200px", display: "grid", placeItems: "center" }}>
@@ -380,12 +478,47 @@ const Course = () => {
         </Grid>
         <Grid item xs={12} sm={4}>
           <Grid container spacing={2}>
+            {recordings.length ? (
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, mb: 2 }}>
+                  <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} mb={2}>
+                    <Typography color="primary" variant="h6" gutterBottom>
+                      Recordings
+                    </Typography>
+                    <LoadingButton disabled={isLoading} loading={isLoading} color="success" variant="contained" startIcon={<Save />} onClick={() => setLectureOpen(true)}>
+                      Save
+                    </LoadingButton>
+                  </Stack>
+                  {recording ? <video src={recording.url} controls style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "5px" }} /> : null}
+                  <Box sx={{ width: "100%", p: 1, pt: 2 }}>
+                    {recordings.map((rec, index) => (
+                      <Tooltip title={rec.title + " - " + new Date(rec.date).toLocaleString()}>
+                        <Badge onClick={() => setRecording(rec)} badgeContent={recordings.length - index} color="secondary" sx={{ mr: 2, cursor: "pointer" }}>
+                          <Save color={rec.date === recording?.date ? "error" : "text.secondary"} fontSize="large" />
+                        </Badge>
+                      </Tooltip>
+                    ))}
+                  </Box>
+                </Paper>
+              </Grid>
+            ) : null}
             <Grid item xs={12}>
               <Paper sx={{ p: 2 }}>
                 <Stack direction="row" justifyContent={"space-between"} alignItems="center" spacing={1}>
                   <Typography color="primary" variant="h6" gutterBottom>
                     Lectures
                   </Typography>
+                  {user?.role === "teacher" ? (
+                    <Button
+                      variant="contained"
+                      startIcon={<Refresh />}
+                      onClick={() => {
+                        setRefresh((refresh) => !refresh);
+                      }}
+                    >
+                      Refresh
+                    </Button>
+                  ) : null}
                 </Stack>
                 {lectures.length ? (
                   <List sx={{ width: "100%" }}>
@@ -393,6 +526,7 @@ const Course = () => {
                       <ListItemButton
                         alignItems="flex-start"
                         onClick={() => {
+                          setIsLive(false);
                           setLecture(lecture);
                         }}
                       >
@@ -482,7 +616,7 @@ const Course = () => {
       </Dialog>
       <Dialog open={lectureOpen} onClose={() => setLectureOpen(false)} PaperComponent={PaperComponent}>
         <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
-          <Typography color="primary" variant="h6">
+          <Typography color="primary" variant="h6" gutterBottom>
             New Lecture
           </Typography>
         </DialogTitle>
@@ -499,14 +633,11 @@ const Course = () => {
         </IconButton>
         <DialogContent>
           <form onSubmit={handleLecture}>
-            <Grid container spacing={2}>
+            <Grid container p={2} spacing={2}>
               <Grid item xs={12}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12}>
                     <TextField required name="name" label="Name" fullWidth variant="standard" />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField required name="youtubeId" label="YouTube Video ID" fullWidth variant="standard" />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField required multiline rows={4} name="description" label="Description" fullWidth variant="outlined" />
@@ -514,8 +645,8 @@ const Course = () => {
                 </Grid>
               </Grid>
               <Grid item xs={12}>
-                <LoadingButton fullWidth disabled={isLoading} loading={isLoading} type="submit" variant="contained">
-                  Create
+                <LoadingButton fullWidth sx={{ mt: 2 }} disabled={isLoading} loading={isLoading} type="submit" variant="contained">
+                  {courseId === "new" ? "Create" : "Update"}
                 </LoadingButton>
               </Grid>
             </Grid>

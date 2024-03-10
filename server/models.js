@@ -113,7 +113,7 @@ const lectureSchema = new mongoose.Schema(
     description: { type: String, required: true },
     date: { type: String, required: true },
     course: { type: String, required: true }, // course _id
-    url: { type: String }, // path to stream
+    youtubeId: { type: String }, // youtube video id
   },
   { timestamps: true }
 );
