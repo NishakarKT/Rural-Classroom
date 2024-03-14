@@ -22,7 +22,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Course = lazy(() => import("./pages/Course"));
 const Test = lazy(() => import("./pages/Test"));
 const Auth = lazy(() => import("./pages/Auth"));
-const AnalyticsTest = lazy(() => import("./pages/AnalyticsTest"));
+const Analytics = lazy(() => import("./pages/Analytics"));
 const AdminStudents = lazy(() => import("./pages/admin/students/index"));
 const AdminPerformance = lazy(() => import("./pages/admin/performance/index"));
 const AdminAttendance = lazy(() => import("./pages/admin/attendance/index"));
@@ -149,7 +149,7 @@ const Dashboard = () => {
                 {user ? (
                   <>
                     {!isProfileComplete(user) ? <Route path="/*" element={<Profile />} /> : null}
-                    <Route path="/analytics/test/:testId" element={<AnalyticsTest />} />
+                    <Route path="/analytics" element={<Analytics />} />
                     <Route path="/course/:courseId" element={<Course />} />
                     <Route path="/test/:testId" element={<Test />} />
                     <Route path="/profile/" element={<Profile />} />

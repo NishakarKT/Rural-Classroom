@@ -11,7 +11,7 @@ const Template = () => {
       <Helmet>
         <title> | {COMPANY}</title>
       </Helmet>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <Paper sx={{ p: 2 }}></Paper>
         </Grid>

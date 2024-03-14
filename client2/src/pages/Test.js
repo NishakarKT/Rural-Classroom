@@ -6,7 +6,6 @@ import Webcam from "react-webcam";
 import Draggable from "react-draggable";
 // constants
 import { COMPANY } from "../constants/vars";
-import { ANALYTICS_TEST_ROUTE } from "../constants/routes";
 import { TEST_GET_ENDPOINT, TEST_EDIT_ENDPOINT, QUESTION_NEW_ENDPOINT, QUESTION_GET_ENDPOINT, QUESTION_EDIT_ENDPOINT, RESPONSE_NEWS_ENDPOINT } from "../constants/endpoints";
 // contexts
 import AppContext from "../contexts/AppContext";
@@ -196,9 +195,6 @@ const Test = () => {
               <Typography color="primary" variant="h6" flex={1} gutterBottom>
                 Test
               </Typography>
-              <Button variant="contained" startIcon={<Insights />} onClick={() => navigate(ANALYTICS_TEST_ROUTE + "/" + testId)}>
-                Analytics
-              </Button>
             </Stack>
             {user?.role === "teacher" ? (
               <form onSubmit={handleQuestion}>

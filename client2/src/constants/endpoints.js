@@ -67,5 +67,6 @@ export const PERFORMANCE_GET_ENDPOINT = BASE + "/performance/get";
 export const PERFORMANCE_NEW_ENDPOINT = BASE + "/performance/new";
 export const PERFORMANCE_EDIT_ENDPOINT = BASE + "/performance/edit";
 export const PERFORMANCE_DELETE_ENDPOINT = BASE + "/performance/delete";
-// analytics 
-export const ANALYTICS_TEST_ENDPOINT = BASE + "/analytics/test";
+// analytics
+export const ANALYTICS_GET_ENDPOINT = BASE + "/analytics/get";
+export const ANALYTICS_MAPPINGS_ENDPOINT = BASE + "/analytics/mappings";

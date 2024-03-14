@@ -94,6 +94,7 @@ Router.patch("/performance/edit", isAuthenticated, performanceCtrls.edit_perform
 Router.delete("/performance/delete", isAuthenticated, performanceCtrls.delete_performance);
 Router.delete("/calendar/delete", isAuthenticated, calendarCtrls.delete_calendar);
 // Analytics Routes
-Router.get("/analytics/test", isAuthenticated, analyticsCtrls.get_test);
+Router.post("/analytics/get", isAuthenticated, analyticsCtrls.get_analytics);
+Router.get("/analytics/mappings", isAuthenticated, analyticsCtrls.get_mappings);
 
 export default Router;

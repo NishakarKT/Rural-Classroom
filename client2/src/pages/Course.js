@@ -20,9 +20,9 @@ import { truncate } from "../utils";
 // apis
 import { getDoubtsFromImage, getAttendanceFromImage } from "../apis/multimedia";
 // mui
-import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Tooltip, Badge, IconButton, TextField, ListItemButton } from "@mui/material";
+import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Badge, IconButton, TextField, ListItemButton, ListItemAvatar, Avatar, Divider } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { VideoCall, Close, Camera, Refresh, Add, FileCopy } from "@mui/icons-material";
+import { VideoCall, Close, Camera, Add, FileCopy } from "@mui/icons-material";
 // vars
 const socket = io(BASE);
 
@@ -48,6 +48,7 @@ const Course = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [doubts, setDoubts] = useState(0);
+  const [classStrength, setClassStrength] = useState(0);
   const [chartData, setChartData] = useState([]);
   const [capturedImage, setCapturedImage] = useState(null);
   const [materials, setMaterials] = useState([]);
@@ -273,10 +274,10 @@ const Course = () => {
   };
 
   const handleAttendance = async () => {
-    if (lecture?._id && attendance?.length) {
+    if (lecture?._id && attendance?.length && classStrength) {
       try {
         axios
-          .post(ATTENDANCE_NEW_ENDPOINT, { coordinator: user?._id, lecture: lecture._id, attendance }, { headers: { Authorization: `Bearer ${token}` } })
+          .post(ATTENDANCE_NEW_ENDPOINT, { coordinator: user?._id, lecture: lecture._id, attendance, percentage: (attendance.length / classStrength) * 100 }, { headers: { Authorization: `Bearer ${token}` } })
           .then((res) => {
             setAttendance([]);
             setDoubtsOpen(false);
@@ -316,7 +317,7 @@ const Course = () => {
                       color={"primary"}
                       startIcon={<VideoCall />}
                       onClick={() => {
-                        setLectureOpen(true);
+                        setTimeout(() => setLectureOpen(true), 0);
                       }}
                     >
                       New Lecture
@@ -390,14 +391,22 @@ const Course = () => {
                 {lectures.length ? (
                   <List sx={{ width: "100%" }}>
                     {lectures.map((lecture) => (
-                      <ListItemButton
-                        alignItems="flex-start"
-                        onClick={() => {
-                          setLecture(lecture);
-                        }}
-                      >
-                        <ListItemText primary={lecture.name} secondary={truncate(lecture.description, 50)} />
-                      </ListItemButton>
+                      <>
+                        <ListItemButton
+                          alignItems="flex-start"
+                          onClick={() => {
+                            setLecture(lecture);
+                          }}
+                        >
+                          <ListItemAvatar>
+                            <Avatar>
+                              <VideoCall />
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText primary={truncate(lecture.name, 40)} secondary={truncate(lecture.description, 80)} />
+                        </ListItemButton>
+                        <Divider />
+                      </>
                     ))}
                   </List>
                 ) : (
@@ -525,7 +534,7 @@ const Course = () => {
       <Dialog open={doubtsOpen} onClose={() => setDoubtsOpen(false)} PaperComponent={PaperComponent}>
         <DialogTitle style={{ cursor: "move" }} id="draggable-dialog-title">
           <Typography color="primary" variant="h6" gutterBottom>
-            Missed on something? Ask your doubts!
+            How to use the captured image?
           </Typography>
         </DialogTitle>
         <IconButton
@@ -555,21 +564,25 @@ const Course = () => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  <TextField required value={doubts} onChange={(e) => setDoubts(e.target.value)} label="Doubts" fullWidth variant="outlined" />
+                <Grid item xs={12} sm={6}>
+                  <Stack spacing={2}>
+                    <TextField required value={doubts} onChange={(e) => setDoubts(e.target.value)} label="Doubts" fullWidth variant="outlined" />
+                    <LoadingButton fullWidth disabled={isLoading} loading={isLoading} variant="contained" onClick={handleDoubts}>
+                      Send Doubts
+                    </LoadingButton>
+                  </Stack>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Stack spacing={2}>
+                    <TextField required value={classStrength} onChange={(e) => setClassStrength(e.target.value)} label="Class Strength" fullWidth variant="outlined" />
+                    <LoadingButton fullWidth disabled={isLoading} loading={isLoading} color="success" variant="contained" onClick={handleAttendance}>
+                      Take Attendance
+                    </LoadingButton>
+                  </Stack>
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <LoadingButton fullWidth disabled={isLoading} loading={isLoading} variant="contained" onClick={handleDoubts}>
-                Send Doubts
-              </LoadingButton>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <LoadingButton fullWidth disabled={isLoading || !lecture?._id} loading={isLoading} color="success" variant="contained" onClick={handleAttendance}>
-                Take Attendance
-              </LoadingButton>
-            </Grid>
+            <Grid item xs={12} sm={6}></Grid>
           </Grid>
         </DialogContent>
       </Dialog>
