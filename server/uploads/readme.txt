@@ -1,0 +1,1 @@
+create uploads dir in /server/ after deployment
