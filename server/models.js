@@ -155,6 +155,18 @@ const performanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const messageSchema = new mongoose.Schema(
+  {
+    lecture: { type: String, required: true }, // lecture _id
+    course: { type: String, required: true }, // course _id
+    date: { type: String, required: true }, // date-time ISO string
+    text: { type: String, required: true }, // message text
+    from: { type: String, required: true }, // user _id
+    fromName: { type: String, required: true }, // user name
+  },
+  { timestamps: true }
+);
+
 export const Otp = new mongoose.model("otp", otpSchema);
 export const User = new mongoose.model("user", userSchema);
 export const Student = new mongoose.model("student", studentSchema);
@@ -168,3 +180,4 @@ export const Performance = new mongoose.model("performance", performanceSchema);
 export const Question = new mongoose.model("question", questionSchema);
 export const Response = new mongoose.model("response", responseSchema);
 export const Material = new mongoose.model("material", materialSchema);
+export const Message = new mongoose.model("message", messageSchema);

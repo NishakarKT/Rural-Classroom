@@ -1,5 +1,5 @@
-// export const BASE = "http://localhost:8000";
-export const BASE = "https://ruralclassroom.onrender.com";
+export const BASE = "http://localhost:8000";
+// export const BASE = "https://ruralclassroom.onrender.com";
 // file
 export const FILE_UPLOAD_ENDPOINT = BASE + "/file/upload";
 // auth
@@ -68,6 +68,11 @@ export const PERFORMANCE_GET_ENDPOINT = BASE + "/performance/get";
 export const PERFORMANCE_NEW_ENDPOINT = BASE + "/performance/new";
 export const PERFORMANCE_EDIT_ENDPOINT = BASE + "/performance/edit";
 export const PERFORMANCE_DELETE_ENDPOINT = BASE + "/performance/delete";
+// message
+export const MESSAGE_GET_ENDPOINT = BASE + "/message/get";
+export const MESSAGE_NEW_ENDPOINT = BASE + "/message/new";
+export const MESSAGE_EDIT_ENDPOINT = BASE + "/message/edit";
+export const MESSAGE_DELETE_ENDPOINT = BASE + "/message/delete";
 // analytics
 export const ANALYTICS_GET_ENDPOINT = BASE + "/analytics/get";
 export const ANALYTICS_MAPPINGS_ENDPOINT = BASE + "/analytics/mappings";

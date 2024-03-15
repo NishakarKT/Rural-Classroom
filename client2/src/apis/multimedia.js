@@ -6,7 +6,6 @@ export const speechToText = async (blob) => {
     body: formData,
   });
   const data = await response.json();
-  console.log(data);
   return data.detail;
 };
 
@@ -23,6 +22,21 @@ export const getDoubtsFromImage = async (blob) => {
   // dummy 1 second response
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return 20;
+};
+
+export const getFilteredMessages = async (messages) => {
+  const rawData = {
+    texts: messages.map((message) => message.text),
+  };
+  const response = await fetch("https://btp-backend-n3xs.onrender.com/process", {
+    method: "POST",
+    body: JSON.stringify(rawData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await response.json();
+  return data;
 };
 
 export const getResponsesFromImage = async (blob) => {

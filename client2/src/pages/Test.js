@@ -137,8 +137,8 @@ const Test = () => {
               setQuestions((questions) => [res.data.data, ...questions]);
               axios
                 .patch(TEST_EDIT_ENDPOINT, { query: { _id: testId }, edits: { questions: [...test.questions, res.data.data._id] } }, { headers: { Authorization: `Bearer ${token}` } })
-                .then((res) => {
-                  setTest((test) => ({ ...test, questions: [...test.questions, res.data.data] }));
+                .then(() => {
+                  setTest((test) => ({ ...test, questions: [...test.questions, res.data.data._id] }));
                   e.target.reset();
                   setIsLoading(false);
                 })
@@ -215,10 +215,10 @@ const Test = () => {
                     <TextField fullWidth value={question.options?.length >= 4 ? question.options[3].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 3 ? { ...option, value: e.target.value } : option)) }))} name="o4" label="Option 4" variant="outlined" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth value={question.options?.length >= 5 ? question.options[4].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 4 ? { ...option, value: e.target.value } : option)) }))} name="o5" label="Option 4" variant="outlined" />
+                    <TextField fullWidth value={question.options?.length >= 5 ? question.options[4].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 4 ? { ...option, value: e.target.value } : option)) }))} name="o5" label="Option 5" variant="outlined" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth value={question.options?.length >= 6 ? question.options[5].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 5 ? { ...option, value: e.target.value } : option)) }))} name="o6" label="Option 4" variant="outlined" />
+                    <TextField fullWidth value={question.options?.length >= 6 ? question.options[5].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 5 ? { ...option, value: e.target.value } : option)) }))} name="o6" label="Option 6" variant="outlined" />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField required fullWidth value={question.answer} onChange={(e) => setQuestion((question) => ({ ...question, answer: e.target.value }))} name="answer" label="Answer" variant="outlined" />

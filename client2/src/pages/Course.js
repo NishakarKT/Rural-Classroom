@@ -13,16 +13,16 @@ import ChatBox from "../components/ChatBox";
 import Chart from "../components/Chart";
 // constants
 import { COMPANY } from "../constants/vars";
-import { BASE, COURSE_GET_ENDPOINT, LECTURE_GET_ENDPOINT, LECTURE_NEW_ENDPOINT, FILE_UPLOAD_ENDPOINT, ATTENDANCE_NEW_ENDPOINT, MATERIAL_GET_ENDPOINT, MATERIAL_NEW_ENDPOINT } from "../constants/endpoints";
+import { BASE, COURSE_GET_ENDPOINT, LECTURE_GET_ENDPOINT, LECTURE_NEW_ENDPOINT, FILE_UPLOAD_ENDPOINT, ATTENDANCE_NEW_ENDPOINT, MATERIAL_GET_ENDPOINT, MATERIAL_NEW_ENDPOINT, MESSAGE_NEW_ENDPOINT, MESSAGE_GET_ENDPOINT } from "../constants/endpoints";
 import { UPLOAD_URL } from "../constants/urls";
 //utils
 import { truncate } from "../utils";
 // apis
-import { getDoubtsFromImage, getAttendanceFromImage } from "../apis/multimedia";
+import { getDoubtsFromImage, getAttendanceFromImage, getFilteredMessages } from "../apis/multimedia";
 // mui
-import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Badge, IconButton, TextField, ListItemButton, ListItemAvatar, Avatar, Divider } from "@mui/material";
+import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Badge, IconButton, TextField, ListItemButton, ListItemAvatar, Avatar, Divider, Tooltip, CircularProgress } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { VideoCall, Close, Camera, Add, FileCopy } from "@mui/icons-material";
+import { VideoCall, Close, Camera, Add, FileCopy, FilterAlt, FilterAltOff } from "@mui/icons-material";
 // vars
 const socket = io(BASE);
 
@@ -46,7 +46,9 @@ const Course = () => {
   const [lecture, setLecture] = useState(null);
   const [lectures, setLectures] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMessagesFiltered, setIsMessagesFiltered] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [filteredMessages, setFilteredMessages] = useState([]);
   const [doubts, setDoubts] = useState(0);
   const [classStrength, setClassStrength] = useState(0);
   const [chartData, setChartData] = useState([]);
@@ -86,6 +88,42 @@ const Course = () => {
   }, [courseId]);
 
   useEffect(() => {
+    (async () => {
+      if (isMessagesFiltered) {
+        setIsLoading(true);
+        const filteredMessages = await getFilteredMessages(messages);
+        setIsLoading(false);
+        setFilteredMessages(filteredMessages.map((message) => ({ text: message, date: new Date().toISOString() })));
+      } else {
+        setFilteredMessages(messages);
+      }
+    })();
+  }, [messages, isMessagesFiltered]);
+
+  useEffect(() => {
+    if (lecture?._id) {
+      try {
+        const query = { lecture: lecture._id };
+        axios
+          .get(MESSAGE_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
+          .then((res) => {
+            setMessages(res.data.data);
+            setFilteredMessages(res.data.data);
+          })
+          .catch((err) => {
+            console.log(err);
+            setMessages([]);
+            setFilteredMessages([]);
+          });
+      } catch (err) {
+        console.log(err);
+        setMessages([]);
+        setFilteredMessages([]);
+      }
+    }
+  }, [lecture]);
+
+  useEffect(() => {
     if (course) {
       // fetch lectures
       try {
@@ -94,7 +132,7 @@ const Course = () => {
           .get(LECTURE_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
           .then((res) => {
             if (res.data.data.length) {
-              setLecture(res.data.data[0]);
+              setLecture(res.data.data[res.data.data.length - 1]);
               setLectures(res.data.data.reverse());
             } else {
               setLecture(null);
@@ -139,6 +177,7 @@ const Course = () => {
     });
     socket.on("message", ({ from, fromName, text, date }) => {
       setMessages((messages) => [...messages, { from, fromName, text, date }]);
+      setFilteredMessages((messages) => [...messages, { from, fromName, text, date }]);
     });
     // join room
     socket.emit("join", { room: courseId });
@@ -179,6 +218,14 @@ const Course = () => {
       const text = e.target.text.value;
       socket.emit("message", { room: courseId, from: user._id, fromName: user.name, text });
       e.target.reset();
+      axios
+        .post(MESSAGE_NEW_ENDPOINT, { course: courseId, lecture: lecture?._id, from: user._id, fromName: user.name, text, date: new Date().toISOString() }, { headers: { Authorization: `Bearer ${token}` } })
+        .then((res) => {
+          console.log("message created");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } else if (typeof e === "string") {
       socket.emit("message", { room: courseId, from: user._id, fromName: user.name, text: e });
     } else {
@@ -359,10 +406,21 @@ const Course = () => {
             </Grid>
             <Grid item xs={12} sm={user?.role === "teacher" ? 4 : 12}>
               <Paper sx={{ p: 2 }}>
-                <Typography color="primary" variant="h6" flex={1} gutterBottom>
-                  Discussion
-                </Typography>
-                <ChatBox messages={messages} handleMessage={handleMessage} />
+                <Stack direction="row" alignItems={"center"} justifyContent={"space-between"} spaacing={2} pb={2}>
+                  <Typography color="primary" variant="h6" flex={1} gutterBottom>
+                    Discussion
+                  </Typography>
+                  {user?.role === "teacher" ? (
+                    isLoading ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      <Tooltip title={isMessagesFiltered ? "Show all" : "Show less"}>
+                        <IconButton onClick={() => setIsMessagesFiltered(!isMessagesFiltered)}>{isMessagesFiltered ? <FilterAlt /> : <FilterAltOff />}</IconButton>
+                      </Tooltip>
+                    )
+                  ) : null}
+                </Stack>
+                <ChatBox messages={filteredMessages} handleMessage={handleMessage} />
               </Paper>
             </Grid>
             {user?.role === "teacher" ? (
