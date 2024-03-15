@@ -60,7 +60,7 @@ const Course = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setChartData((prev) => [...prev, { doubts: 0, time: new Date().toLocaleTimeString() }]);
-    }, 1000);
+    }, 2000);
     return () => {
       clearInterval(interval);
     };
@@ -228,6 +228,15 @@ const Course = () => {
         });
     } else if (typeof e === "string") {
       socket.emit("message", { room: courseId, from: user._id, fromName: user.name, text: e });
+      if (e.toLowerCase() !== "unable to transcribe")
+        axios
+          .post(MESSAGE_NEW_ENDPOINT, { course: courseId, lecture: lecture?._id, from: user._id, fromName: user.name, text: e, date: new Date().toISOString() }, { headers: { Authorization: `Bearer ${token}` } })
+          .then((res) => {
+            console.log("message created");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
     } else {
       console.log("error in handling message");
     }
@@ -404,7 +413,7 @@ const Course = () => {
                 </Stack>
               </Paper>
             </Grid>
-            <Grid item xs={12} sm={user?.role === "teacher" ? 4 : 12}>
+            <Grid item xs={12} sm={user?.role === "teacher" ? 6 : 12}>
               <Paper sx={{ p: 2 }}>
                 <Stack direction="row" alignItems={"center"} justifyContent={"space-between"} spaacing={2} pb={2}>
                   <Typography color="primary" variant="h6" flex={1} gutterBottom>
@@ -424,7 +433,7 @@ const Course = () => {
               </Paper>
             </Grid>
             {user?.role === "teacher" ? (
-              <Grid item xs={12} sm={8}>
+              <Grid item xs={12} sm={6}>
                 <Paper sx={{ p: 2 }}>
                   <Typography color="primary" variant="h6" flex={1} gutterBottom>
                     Live Doubts

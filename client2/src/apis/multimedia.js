@@ -6,7 +6,8 @@ export const speechToText = async (blob) => {
     body: formData,
   });
   const data = await response.json();
-  return data.detail;
+  console.log(data);
+  return data.transcript;
 };
 
 export const getDoubtsFromImage = async (blob) => {

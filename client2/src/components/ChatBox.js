@@ -4,7 +4,7 @@ import { useReactMediaRecorder } from "react-media-recorder";
 import { speechToText } from "../apis/multimedia";
 // mui
 import { Box, Stack, TextField, IconButton, CircularProgress } from "@mui/material";
-import { Mic, MicOff, Send } from "@mui/icons-material";
+import { Mic, MicOff, Send, AudioFile } from "@mui/icons-material";
 import ChatMessage from "./ChatMessage";
 // vars
 const mimeType = "audio/webm;codecs=opus";
@@ -23,11 +23,16 @@ const ChatBox = ({ messages, handleMessage }) => {
       if (mediaBlobUrl) {
         setIsLoading(true);
         try {
-          const mediaBlob = await fetch(mediaBlobUrl).then((r) => r.blob());
-          const blobWithMimeType = new Blob([mediaBlob], { type: mimeType });
-          const text = await speechToText(blobWithMimeType);
-          handleMessage(text);
-          setIsLoading(false);
+          const response = await fetch(mediaBlobUrl);
+          const blob = await response.blob();
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            const blobWithMimeType = new Blob([new Uint8Array(e.target.result)], { type: mimeType });
+            const text = await speechToText(blobWithMimeType);
+            handleMessage(text);
+            setIsLoading(false);
+          };
+          reader.readAsArrayBuffer(blob);
         } catch (err) {
           setIsLoading(false);
           console.log(err);
@@ -37,10 +42,38 @@ const ChatBox = ({ messages, handleMessage }) => {
   }, [mediaBlobUrl]);
 
   const handleMic = () => {
-    if (status === "idle" || status === "stopped") {
+    if ((status === "idle" || status === "stopped") && !isLoading) {
       startRecording();
     } else {
       stopRecording();
+    }
+  };
+
+  const handleAudioFile = () => {
+    if (!isLoading) {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "audio/*";
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            setIsLoading(true);
+            try {
+              const blobWithMimeType = new Blob([new Uint8Array(e.target.result)], { type: mimeType });
+              const text = await speechToText(blobWithMimeType);
+              handleMessage(text);
+              setIsLoading(false);
+            } catch (err) {
+              setIsLoading(false);
+              console.log(err);
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        }
+      };
+      input.click();
     }
   };
 
@@ -51,12 +84,19 @@ const ChatBox = ({ messages, handleMessage }) => {
           <ChatMessage key={"chat" + index} message={message} />
         ))}
       </Stack>
-      <Stack direction="row" alignItems="flex-end" spacing={1}>
-        {isLoading ? <CircularProgress size="1.5rem" /> : <IconButton onClick={handleMic}>{status === "idle" || status === "stopped" ? <MicOff color="primary" /> : <Mic color="error" />}</IconButton>}
-        <TextField fullWidth variant="standard" label="Type your message." placeholder="Ex:- I have a doubt!" name="text" type="text" />
-        <IconButton type="submit">
-          <Send />
+      <Stack direction="row" alignItems="flex-end">
+        <IconButton onClick={handleAudioFile}>
+          <AudioFile color="success" />
         </IconButton>
+        <IconButton onClick={handleMic}>{status === "idle" || status === "stopped" ? <MicOff color="primary" /> : <Mic color="error" />}</IconButton>
+        <TextField fullWidth sx={{ mx: 1 }} variant="standard" label="Type your message." placeholder="Ex:- I have a doubt!" name="text" type="text" />
+        {isLoading ? (
+          <CircularProgress sx={{ height: "auto !important" }} />
+        ) : (
+          <IconButton type="submit">
+            <Send />
+          </IconButton>
+        )}
       </Stack>
     </Box>
   );
