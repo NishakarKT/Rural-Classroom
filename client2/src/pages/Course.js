@@ -13,16 +13,16 @@ import ChatBox from "../components/ChatBox";
 import Chart from "../components/Chart";
 // constants
 import { COMPANY } from "../constants/vars";
-import { BASE, COURSE_GET_ENDPOINT, LECTURE_GET_ENDPOINT, LECTURE_NEW_ENDPOINT, FILE_UPLOAD_ENDPOINT, ATTENDANCE_NEW_ENDPOINT, MATERIAL_GET_ENDPOINT, MATERIAL_NEW_ENDPOINT, MESSAGE_NEW_ENDPOINT, MESSAGE_GET_ENDPOINT } from "../constants/endpoints";
+import { BASE, COURSE_GET_ENDPOINT, LECTURE_GET_ENDPOINT, LECTURE_NEW_ENDPOINT, FILE_UPLOAD_ENDPOINT, ATTENDANCE_NEW_ENDPOINT, MATERIAL_GET_ENDPOINT, MATERIAL_NEW_ENDPOINT, MESSAGE_NEW_ENDPOINT, MESSAGE_GET_ENDPOINT, RESPONSE_NEWS_ENDPOINT, TEST_GET_ENDPOINT, QUESTION_GET_ENDPOINT } from "../constants/endpoints";
 import { UPLOAD_URL } from "../constants/urls";
 //utils
 import { truncate } from "../utils";
 // apis
-import { getDoubtsFromImage, getAttendanceFromImage, getFilteredMessages } from "../apis/multimedia";
+import { getDoubtsFromImage, getAttendanceFromImage, getResponsesFromImage, getFilteredMessages } from "../apis/multimedia";
 // mui
-import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Badge, IconButton, TextField, ListItemButton, ListItemAvatar, Avatar, Divider, Tooltip, CircularProgress } from "@mui/material";
+import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Badge, IconButton, TextField, ListItemButton, ListItemAvatar, Avatar, Divider, Tooltip, CircularProgress, SwipeableDrawer, Autocomplete } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { VideoCall, Close, Camera, Add, FileCopy, FilterAlt, FilterAltOff } from "@mui/icons-material";
+import { VideoCall, Close, Camera, Add, FileCopy, FilterAlt, FilterAltOff, Fullscreen, Checklist, PanTool, QuestionAnswer } from "@mui/icons-material";
 // vars
 const socket = io(BASE);
 
@@ -41,7 +41,11 @@ const Course = () => {
   const { courseId } = useParams();
   const [lectureOpen, setLectureOpen] = useState(false);
   const [doubtsOpen, setDoubtsOpen] = useState(false);
+  const [responsesOpen, setResponsesOpen] = useState(false);
   const [materialsOpen, setMaterialsOpen] = useState(false);
+  const [test, setTest] = useState(null);
+  const [testQuestion, setTestQuestion] = useState(null);
+  const [testQuestions, setTestQuestions] = useState([]);
   const [course, setCourse] = useState(null);
   const [lecture, setLecture] = useState(null);
   const [lectures, setLectures] = useState([]);
@@ -50,12 +54,14 @@ const Course = () => {
   const [messages, setMessages] = useState([]);
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [doubts, setDoubts] = useState(0);
+  const [responses, setResponses] = useState([]);
   const [classStrength, setClassStrength] = useState(0);
   const [chartData, setChartData] = useState([]);
   const [capturedImage, setCapturedImage] = useState(null);
   const [materials, setMaterials] = useState([]);
   const [materialFiles, setMaterialsFiles] = useState([]);
   const [attendance, setAttendance] = useState([]);
+  const [viewMode, setViewMode] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -102,6 +108,7 @@ const Course = () => {
 
   useEffect(() => {
     if (lecture?._id) {
+      // get messages
       try {
         const query = { lecture: lecture._id };
         axios
@@ -119,6 +126,47 @@ const Course = () => {
         console.log(err);
         setMessages([]);
         setFilteredMessages([]);
+      }
+      // get test
+      try {
+        const query = { lecture: lecture._id };
+        axios
+          .get(TEST_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
+          .then((res) => {
+            if (res.data.data.length) {
+              setTest(res.data.data[0]);
+              // fetch questions
+              try {
+                const query = { _id: { $in: res.data.data[0].questions } };
+                axios
+                  .get(QUESTION_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
+                  .then((res) => {
+                    if (res.data.data.length) {
+                      setTestQuestion(res.data.data[0]);
+                      setTestQuestions(res.data.data);
+                    } else {
+                      setTestQuestion(null);
+                      setTestQuestions([]);
+                    }
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    setTestQuestion(null);
+                    setTestQuestions(null);
+                  });
+              } catch (err) {
+                console.log(err);
+                setTestQuestions(null);
+              }
+            } else setTest(null);
+          })
+          .catch((err) => {
+            console.log(err);
+            setTest(null);
+          });
+      } catch (err) {
+        console.log(err);
+        setTest(null);
       }
     }
   }, [lecture]);
@@ -188,27 +236,16 @@ const Course = () => {
   }, [user]);
 
   useEffect(() => {
-    (async () => {
-      if (capturedImage) {
-        setIsLoading(true);
-        try {
-          const imageBlob = await fetch(capturedImage).then((r) => r.blob());
-          const doubts = await getDoubtsFromImage(imageBlob);
-          const attendance = await getAttendanceFromImage(imageBlob);
-          setDoubts(doubts);
-          setAttendance(attendance);
-          setIsLoading(false);
-        } catch (err) {
-          setIsLoading(false);
-          console.log(err);
-        }
-      }
-    })();
-  }, [capturedImage]);
+    if (attendance?.length) handleAttendance();
+  }, [attendance]);
+
+  useEffect(() => {
+    if (responses?.length) handleResponses();
+  }, [responses]);
 
   const captureImage = () => {
-    const capturedImage = myStreamRef.current.getScreenshot();
-    setCapturedImage(capturedImage);
+    // const capturedImage = myStreamRef.current.getScreenshot();
+    // setCapturedImage(capturedImage);
     setDoubtsOpen(true);
   };
 
@@ -323,21 +360,23 @@ const Course = () => {
     }
   };
 
-  const handleDoubts = async () => {
+  const handleDoubts = async (doubts) => {
     socket.emit("doubts", { room: courseId, doubts });
     setDoubtsOpen(false);
     setCapturedImage(null);
+    alert("Doubts have been raised!");
   };
 
   const handleAttendance = async () => {
-    if (lecture?._id && attendance?.length && classStrength) {
+    if (lecture?._id && attendance?.length) {
       try {
         axios
           .post(ATTENDANCE_NEW_ENDPOINT, { coordinator: user?._id, lecture: lecture._id, attendance, percentage: (attendance.length / classStrength) * 100 }, { headers: { Authorization: `Bearer ${token}` } })
-          .then((res) => {
+          .then(() => {
             setAttendance([]);
             setDoubtsOpen(false);
             setCapturedImage(null);
+            alert("Attendance has been taken!");
           })
           .catch((err) => {
             setDoubtsOpen(false);
@@ -349,6 +388,56 @@ const Course = () => {
         console.log(err);
       }
     }
+  };
+
+  const handleResponses = () => {
+    if (responses.length && test && testQuestion) {
+      try {
+        axios.post(RESPONSE_NEWS_ENDPOINT, responses, { headers: { Authorization: `Bearer ${token}` } }).then((res) => {
+          if (res.data.data) {
+            setResponsesOpen(false);
+            setCapturedImage(null);
+            setDoubtsOpen(false);
+            alert("Your responses have been uploaded!");
+          } else {
+            alert("Your responses have NOT been uploaded!");
+          }
+        });
+      } catch (err) {
+        alert("Your responses have NOT been uploaded!");
+      }
+    }
+  };
+
+  const handleDoubtsCapture = async () => {
+    if (doubts) handleDoubts(doubts);
+    else {
+      setIsLoading(true);
+      const capturedImage = myStreamRef.current.getScreenshot();
+      const imageBlob = await fetch(capturedImage).then((r) => r.blob());
+      const doubts = await getDoubtsFromImage(imageBlob);
+      handleDoubts(doubts);
+      setIsLoading(false);
+    }
+  };
+
+  const handleAttendanceCapture = async () => {
+    setIsLoading(true);
+    const capturedImage = myStreamRef.current.getScreenshot();
+    const imageBlob = await fetch(capturedImage).then((r) => r.blob());
+    const attendance = await getAttendanceFromImage(imageBlob);
+    setAttendance(attendance);
+    setIsLoading(false);
+  };
+
+  const handleResponsesCapture = async () => {
+    setIsLoading(true);
+    const capturedImage = myStreamRef.current.getScreenshot();
+    const imageBlob = await fetch(capturedImage).then((r) => r.blob());
+    const responses = await getResponsesFromImage(imageBlob);
+    const processedResponses = responses.map((response) => ({ test: test?._id, question: testQuestion._id, student: user?._id + "_" + response.roll, response: testQuestion.options.find((q) => q.key === response.response)?.value }));
+    setResponses(processedResponses);
+    setIsLoading(false);
   };
 
   return (
@@ -379,6 +468,11 @@ const Course = () => {
                       New Lecture
                     </Button>
                   ) : null}
+                  {user?.role !== "teacher" ? (
+                    <IconButton>
+                      <Fullscreen onClick={() => setViewMode(true)} />
+                    </IconButton>
+                  ) : null}
                 </Stack>
                 <Stack direction="row" alignItems="center" sx={{ position: "relative" }}>
                   {lecture ? (
@@ -392,9 +486,6 @@ const Course = () => {
                       opts={{
                         height: "300",
                         width: "100%",
-                        playerVars: {
-                          autoplay: 1,
-                        },
                       }}
                     />
                   ) : null}
@@ -620,7 +711,7 @@ const Course = () => {
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
-                  <CardMedia
+                  {/* <CardMedia
                     component="img"
                     image={capturedImage}
                     sx={{
@@ -629,21 +720,29 @@ const Course = () => {
                       objectFit: "cover",
                       borderRadius: "5px",
                     }}
-                  />
+                  /> */}
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <Stack spacing={2}>
                     <TextField required value={doubts} onChange={(e) => setDoubts(e.target.value)} label="Doubts" fullWidth variant="outlined" />
-                    <LoadingButton fullWidth disabled={isLoading} loading={isLoading} variant="contained" onClick={handleDoubts}>
-                      Send Doubts
+                    <LoadingButton fullWidth disabled={isLoading} loading={isLoading} variant="contained" onClick={handleDoubtsCapture}>
+                      Doubts
                     </LoadingButton>
                   </Stack>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <Stack spacing={2}>
                     <TextField required value={classStrength} onChange={(e) => setClassStrength(e.target.value)} label="Class Strength" fullWidth variant="outlined" />
-                    <LoadingButton fullWidth disabled={isLoading} loading={isLoading} color="success" variant="contained" onClick={handleAttendance}>
-                      Take Attendance
+                    <LoadingButton fullWidth disabled={isLoading || !classStrength} loading={isLoading} color="success" variant="contained" onClick={handleAttendanceCapture}>
+                      Attendance
+                    </LoadingButton>
+                  </Stack>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Stack spacing={2}>
+                    <Autocomplete fullWidth value={testQuestion} onChange={(e, value) => setTestQuestion(value)} options={testQuestions} getOptionLabel={(option) => option.question} renderInput={(params) => <TextField {...params} required label="Question" variant="outlined" />} />
+                    <LoadingButton fullWidth disabled={isLoading || !testQuestion} loading={isLoading} color="success" variant="contained" onClick={handleResponsesCapture}>
+                      Responses
                     </LoadingButton>
                   </Stack>
                 </Grid>
@@ -653,6 +752,71 @@ const Course = () => {
           </Grid>
         </DialogContent>
       </Dialog>
+      <SwipeableDrawer anchor={"bottom"} open={viewMode && user?.role !== "teacher"} onClose={() => setViewMode(false)} onOpen={() => setViewMode(true)} sx={{ zIndex: 99999 }}>
+        <Stack sx={{ width: "100%", height: "100vh" }}>
+          <Box
+            sx={{
+              flex: 1,
+              position: "relative",
+              width: "100%",
+            }}
+          >
+            {lecture ? (
+              <YouTube
+                style={{
+                  position: "absolute",
+                  zIndex: 1,
+                  width: "100%",
+                  height: "100%",
+                }}
+                videoId={lecture.youtubeId}
+                opts={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            ) : null}
+          </Box>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Box sx={{ position: "relative", flex: 1 }}>
+              <ChatBox sx={{ position: "absolute", top: "-328px", zIndex: 1 }} overlay messages={filteredMessages} handleMessage={handleMessage} />
+            </Box>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} p={1} sx={{ flex: { xs: 0, md: 1 } }}>
+              <Stack direction="row" spacing={1} flex={1}>
+                <Stack direction="row">
+                  <TextField required value={classStrength} onChange={(e) => setClassStrength(e.target.value)} label="Class Strength" variant="standard" />
+                  <Tooltip title="Attendance">
+                    <IconButton disabled={isLoading || !classStrength}>
+                      <Checklist onClick={handleAttendanceCapture} />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+                <Stack direction="row">
+                  <TextField required value={doubts} onChange={(e) => setDoubts(e.target.value)} label="Doubts" variant="standard" />
+                  <Tooltip title="Doubts">
+                    <IconButton disables={isLoading}>
+                      <PanTool onClick={handleDoubtsCapture} />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+                <Stack direction="row" flex={1}>
+                  <Autocomplete fullWidth value={testQuestion} onChange={(e, value) => setTestQuestion(value)} options={testQuestions} getOptionLabel={(option) => option.question} renderInput={(params) => <TextField {...params} required label="Question" variant="standard" />} />
+                  <Tooltip title="Responses">
+                    <IconButton disabled={isLoading || !testQuestion}>
+                      <QuestionAnswer onClick={handleResponsesCapture} />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Stack>
+              <Tooltip title="Close">
+                <IconButton>
+                  <Close onClick={() => setViewMode(false)} />
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          </Stack>
+        </Stack>
+      </SwipeableDrawer>
     </Container>
   );
 };

@@ -71,6 +71,7 @@ export const new_responses = async (req, res) => {
     }
   } catch (err) {
     if (res.statusCode < 400) res.status(500);
+    console.log(err);
     res.send({ message: err.message || "something went wrong" });
   }
 };

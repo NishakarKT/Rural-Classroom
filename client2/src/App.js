@@ -4,7 +4,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet";
 // constants
 import { LOCALSTORAGE, COMPANY } from "./constants/vars";
-import { AUTH_TOKEN_ENDPOINT, COURSE_GET_ENDPOINT, TEST_GET_ENDPOINT } from "./constants/endpoints";
+import { AUTH_TOKEN_ENDPOINT, COURSE_GET_ENDPOINT, TEST_GET_ENDPOINT, LECTURE_GET_ENDPOINT } from "./constants/endpoints";
 // components
 import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
@@ -33,6 +33,7 @@ const Dashboard = () => {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState({});
   const [courses, setCourses] = useState([]);
+  const [lectures, setLectures] = useState([]);
   const [tests, setTests] = useState([]);
   const [open, setOpen] = useState(false);
   const [showAdminSideBar, setShowAdminSideBar] = useState(false);
@@ -91,6 +92,19 @@ const Dashboard = () => {
             console.log("Something went wrong! Courses couldn't be fetched.");
           });
       }
+      // fetch lectures
+      {
+        const query = {};
+        query["course"] = { $in: user.courses };
+        axios
+          .get(LECTURE_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
+          .then((res) => {
+            setLectures(res.data.data);
+          })
+          .catch((err) => {
+            console.log("Something went wrong! Courses couldn't be fetched.");
+          });
+      }
       // fetch tests
       {
         const query = {};
@@ -123,7 +137,7 @@ const Dashboard = () => {
   const theme = createTheme({ palette: { mode } });
   return (
     <ThemeProvider theme={theme}>
-      <AppContext.Provider value={{ mode, handleMode, user, setUser, token, setToken, courses, setCourses, tests, setTests }}>
+      <AppContext.Provider value={{ mode, handleMode, user, setUser, token, setToken, courses, setCourses, lectures, setLectures, tests, setTests }}>
         <Helmet>
           <title>{COMPANY}</title>
         </Helmet>

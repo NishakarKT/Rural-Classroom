@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import { Helmet } from "react-helmet";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Webcam from "react-webcam";
 import Draggable from "react-draggable";
 // constants
@@ -15,7 +15,7 @@ import { getResponsesFromImage } from "../apis/multimedia";
 // mui
 import { Container, Grid, Paper, TextField, Typography, List, ListItemText, ListItemButton, Stack, Button, Box, IconButton, Dialog, DialogContent, DialogTitle, CardMedia } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { Add, Edit, Upload, Camera, Close, Insights } from "@mui/icons-material";
+import { Add, Edit, Upload, Camera, Close } from "@mui/icons-material";
 // vars
 const questionTemplate = {
   question: "",
@@ -39,7 +39,6 @@ function PaperComponent(props) {
 }
 
 const Test = () => {
-  const navigate = useNavigate();
   const { testId } = useParams();
   const myStreamRef = useRef(null);
   const { token, user } = useContext(AppContext);

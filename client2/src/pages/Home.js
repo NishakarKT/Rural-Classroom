@@ -22,8 +22,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const Home = () => {
   const coursePicRef = useRef(null);
   const testPicRef = useRef(null);
-  const { user, token, courses, setCourses, tests, setTests } = useContext(AppContext);
+  const { user, token, courses, setCourses, lectures, tests, setTests } = useContext(AppContext);
   const [courseId, setCourseId] = useState(null);
+  const [course, setCourse] = useState(null);
   const [testId, setTestId] = useState(null);
   const [coursePic, setCoursePic] = useState(null);
   const [testPic, setTestPic] = useState(null);
@@ -92,45 +93,46 @@ const Home = () => {
       edits["teacher"] = user._id;
       edits["date"] = new Date().toISOString();
       edits["course"] = courses.find((c) => c.name === edits.course)._id;
-      if (testPic) {
-        const picData = new FormData();
-        const fileName = user.role + "." + user.email + ".test." + edits.name + "." + testPic.name.split(".").at(-1);
-        edits["testPic"] = fileName;
-        picData.append("files", testPic, fileName);
+      edits["lecture"] = lectures.find((l) => l.name === edits.lecture)._id;
+        if (testPic) {
+          const picData = new FormData();
+          const fileName = user.role + "." + user.email + ".test." + edits.name + "." + testPic.name.split(".").at(-1);
+          edits["testPic"] = fileName;
+          picData.append("files", testPic, fileName);
+          try {
+            setIsLoading(true);
+            axios
+              .post(FILE_UPLOAD_ENDPOINT, picData, { headers: { Authorization: `Bearer ${token}` } })
+              .then((res) => {
+                setIsLoading(false);
+              })
+              .catch((err) => {
+                alert("Something went wrong! Test Picture couldn't be uploaded.");
+                setIsLoading(false);
+              });
+          } catch (err) {
+            alert("Something went wrong! Test Picture couldn't be uploaded.");
+            setIsLoading(false);
+          }
+        }
         try {
           setIsLoading(true);
-          axios
-            .post(FILE_UPLOAD_ENDPOINT, picData, { headers: { Authorization: `Bearer ${token}` } })
+          (testId === "new" ? axios.post(TEST_NEW_ENDPOINT, edits, { headers: { Authorization: `Bearer ${token}` } }) : axios.patch(TEST_EDIT_ENDPOINT, { query: { _id: testId }, edits }, { headers: { Authorization: `Bearer ${token}` } }))
             .then((res) => {
+              setTests((tests) => [res.data.data, ...tests]);
+              setTestId(null);
               setIsLoading(false);
             })
             .catch((err) => {
-              alert("Something went wrong! Test Picture couldn't be uploaded.");
+              alert("Your test has NOT been updated!");
+              setTestId(null);
               setIsLoading(false);
             });
         } catch (err) {
-          alert("Something went wrong! Test Picture couldn't be uploaded.");
+          alert("Your test has NOT been updated!");
+          setTestId(null);
           setIsLoading(false);
         }
-      }
-      try {
-        setIsLoading(true);
-        (testId === "new" ? axios.post(TEST_NEW_ENDPOINT, edits, { headers: { Authorization: `Bearer ${token}` } }) : axios.patch(TEST_EDIT_ENDPOINT, { query: { _id: testId }, edits }, { headers: { Authorization: `Bearer ${token}` } }))
-          .then((res) => {
-            setTests((tests) => [res.data.data, ...tests]);
-            setTestId(null);
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            alert("Your test has NOT been updated!");
-            setTestId(null);
-            setIsLoading(false);
-          });
-      } catch (err) {
-        alert("Your test has NOT been updated!");
-        setTestId(null);
-        setIsLoading(false);
-      }
     }
   };
 
@@ -275,7 +277,7 @@ const Home = () => {
           </Grid>
         </form>
       </Dialog>
-      <Dialog open={!!testId} onClose={handleCloseTest} TransitionComponent={Transition}>
+      <Dialog open={testId} onClose={handleCloseTest} TransitionComponent={Transition}>
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
             <Typography sx={{ flex: 1 }} variant="h6" component="div">
@@ -290,11 +292,14 @@ const Home = () => {
           <Grid container p={2} spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <TextField required name="name" label="Name" fullWidth variant="standard" />
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Autocomplete name="course" options={courses} getOptionLabel={(option) => option.name} renderInput={(params) => <TextField {...params} required name="course" label="Course" variant="standard" />} />
+                <Grid item xs={12} sm={4}>
+                  <Autocomplete name="course" onChange={(e, value) => setCourse(value)} options={courses} getOptionLabel={(option) => option.name} renderInput={(params) => <TextField {...params} required name="course" label="Course" variant="standard" />} />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Autocomplete name="lecture" options={lectures.filter((lecture) => lecture.course === course?._id)} getOptionLabel={(option) => option.name} renderInput={(params) => <TextField {...params} required name="lecture" label="Lecture" variant="standard" />} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField required multiline rows={4} name="description" label="Description" fullWidth variant="outlined" />

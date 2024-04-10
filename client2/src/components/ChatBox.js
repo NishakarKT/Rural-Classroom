@@ -9,7 +9,7 @@ import ChatMessage from "./ChatMessage";
 // vars
 const mimeType = "audio/webm;codecs=opus";
 
-const ChatBox = ({ messages, handleMessage }) => {
+const ChatBox = ({ sx, overlay, messages, handleMessage }) => {
   const chatBoxRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ audio: true });
@@ -78,10 +78,22 @@ const ChatBox = ({ messages, handleMessage }) => {
   };
 
   return (
-    <Box component="form" onSubmit={handleMessage} sx={{ width: "100%" }}>
-      <Stack ref={chatBoxRef} sx={{ p: 2, maxHeight: "300px", overflowX: "hidden", overflowY: "auto" }}>
+    <Box component="form" onSubmit={handleMessage} sx={{ ...sx, width: "100%" }}>
+      <Stack
+        ref={chatBoxRef}
+        sx={{
+          p: 2,
+          height: "300px",
+          overflowX: "hidden",
+          background: overlay ? "linear-gradient(45deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))" : "transparent",
+          overflowY: "auto",
+          "&::-webkit-scrollbar": {
+            display: overlay ? "none" : "auto",
+          },
+        }}
+      >
         {messages.map((message, index) => (
-          <ChatMessage key={"chat" + index} message={message} />
+          <ChatMessage key={"chat" + index} overlay={overlay} message={message} />
         ))}
       </Stack>
       <Stack direction="row" alignItems="flex-end">

@@ -90,6 +90,7 @@ const testSchema = new mongoose.Schema(
     syllabus: { type: String, required: true },
     teacher: { type: String, required: true }, // teacher's _id
     course: { type: String, required: true }, // course _id
+    lecture: { type: String, required: true }, // lecture _id
     date: { type: String, required: true }, // ISO string
     testPic: { type: String }, // path to file
     questions: [{ type: String, required: true }], // question _ids
