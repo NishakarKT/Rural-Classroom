@@ -40,7 +40,7 @@ const CourseCard = ({ course }) => {
   }, [course]);
 
   return (
-    <Card sx={{ maxWidth: "325px" }}>
+    <Card>
       <CardHeader avatar={<Avatar src={UPLOAD_URL + teacher?.profilePic}>{teacher?.name ? teacher.name[0] : "T"}</Avatar>} align="left" title={course.name} subheader={new Date(course.date).toLocaleString()} />
       <CardMedia component="img" height="194" image={UPLOAD_URL + course.coursePic} alt={course.name} />
       <CardContent>

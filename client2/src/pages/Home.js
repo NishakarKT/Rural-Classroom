@@ -94,45 +94,45 @@ const Home = () => {
       edits["date"] = new Date().toISOString();
       edits["course"] = courses.find((c) => c.name === edits.course)._id;
       edits["lecture"] = lectures.find((l) => l.name === edits.lecture)._id;
-        if (testPic) {
-          const picData = new FormData();
-          const fileName = user.role + "." + user.email + ".test." + edits.name + "." + testPic.name.split(".").at(-1);
-          edits["testPic"] = fileName;
-          picData.append("files", testPic, fileName);
-          try {
-            setIsLoading(true);
-            axios
-              .post(FILE_UPLOAD_ENDPOINT, picData, { headers: { Authorization: `Bearer ${token}` } })
-              .then((res) => {
-                setIsLoading(false);
-              })
-              .catch((err) => {
-                alert("Something went wrong! Test Picture couldn't be uploaded.");
-                setIsLoading(false);
-              });
-          } catch (err) {
-            alert("Something went wrong! Test Picture couldn't be uploaded.");
-            setIsLoading(false);
-          }
-        }
+      if (testPic) {
+        const picData = new FormData();
+        const fileName = user.role + "." + user.email + ".test." + edits.name + "." + testPic.name.split(".").at(-1);
+        edits["testPic"] = fileName;
+        picData.append("files", testPic, fileName);
         try {
           setIsLoading(true);
-          (testId === "new" ? axios.post(TEST_NEW_ENDPOINT, edits, { headers: { Authorization: `Bearer ${token}` } }) : axios.patch(TEST_EDIT_ENDPOINT, { query: { _id: testId }, edits }, { headers: { Authorization: `Bearer ${token}` } }))
+          axios
+            .post(FILE_UPLOAD_ENDPOINT, picData, { headers: { Authorization: `Bearer ${token}` } })
             .then((res) => {
-              setTests((tests) => [res.data.data, ...tests]);
-              setTestId(null);
               setIsLoading(false);
             })
             .catch((err) => {
-              alert("Your test has NOT been updated!");
-              setTestId(null);
+              alert("Something went wrong! Test Picture couldn't be uploaded.");
               setIsLoading(false);
             });
         } catch (err) {
-          alert("Your test has NOT been updated!");
-          setTestId(null);
+          alert("Something went wrong! Test Picture couldn't be uploaded.");
           setIsLoading(false);
         }
+      }
+      try {
+        setIsLoading(true);
+        (testId === "new" ? axios.post(TEST_NEW_ENDPOINT, edits, { headers: { Authorization: `Bearer ${token}` } }) : axios.patch(TEST_EDIT_ENDPOINT, { query: { _id: testId }, edits }, { headers: { Authorization: `Bearer ${token}` } }))
+          .then((res) => {
+            setTests((tests) => [res.data.data, ...tests]);
+            setTestId(null);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            alert("Your test has NOT been updated!");
+            setTestId(null);
+            setIsLoading(false);
+          });
+      } catch (err) {
+        alert("Your test has NOT been updated!");
+        setTestId(null);
+        setIsLoading(false);
+      }
     }
   };
 
@@ -176,16 +176,18 @@ const Home = () => {
                 </Button>
               ) : null}
             </Stack>
-            <Carousel showIndicators={false} showStatus={false} showThumbs={false}>
+            <Carousel autoPlay infiniteLoop showIndicators={false} showStatus={false} showThumbs={false}>
               {courses && courses.length ? (
                 courses
                   .filter((c, i) => i % 4 === 0)
                   .map((course, index) => (
-                    <Stack key={course._id} direction="row" spacing={2} px={6} py={2}>
+                    <Grid container sx={{ px: { xs: 2, sm: 6 }, py: 2 }} spacing={2}>
                       {courses.slice(index * 4, index * 4 + 4).map((course, idx) => (
-                        <CourseCard key={course._id + index * 4 + idx} course={course} />
+                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                          <CourseCard key={course._id + index * 4 + idx} course={course} />
+                        </Grid>
                       ))}
-                    </Stack>
+                    </Grid>
                   ))
               ) : (
                 <Typography color="text.secondary" component="p" variant="h6" sx={{ py: 4 }} gutterBottom>
@@ -209,16 +211,18 @@ const Home = () => {
                 </Button>
               ) : null}
             </Stack>
-            <Carousel showIndicators={false} showStatus={false} showThumbs={false}>
+            <Carousel autoPlay infiniteLoop showIndicators={false} showStatus={false} showThumbs={false}>
               {tests && tests.length ? (
                 tests
                   .filter((c, i) => i % 4 === 0)
                   .map((test, index) => (
-                    <Stack key={test._id} direction="row" spacing={2} px={6} py={2}>
+                    <Grid container sx={{ px: { xs: 2, sm: 6 }, py: 2 }} spacing={2}>
                       {tests.slice(index * 4, index * 4 + 4).map((test, idx) => (
-                        <TestCard key={test._id + index * 4 + idx} test={test} />
+                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                          <TestCard key={test._id + index * 4 + idx} test={test} />
+                        </Grid>
                       ))}
-                    </Stack>
+                    </Grid>
                   ))
               ) : (
                 <Typography color="text.secondary" component="p" variant="h6" sx={{ py: 4 }} gutterBottom>
