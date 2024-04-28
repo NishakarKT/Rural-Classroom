@@ -1,7 +1,7 @@
-import { Avatar, Box, Typography } from "@mui/material";
+import { Avatar, Box, Typography, Button } from "@mui/material";
 import { formattedDate } from "../../../utils";
 
-const StudentRowColumns = () => {
+const UsersRowColumns = ({setChangeRoleDialog, setSelectedUser}) => {
   return [
     {
       label: "Name",
@@ -29,12 +29,12 @@ const StudentRowColumns = () => {
       },
     },
     {
-      label: "Roll number",
+      label: "Email",
       width: 2,
       value: (x) => {
         return (
           <Typography >
-            {x.roll.split('_')[1]}
+            {x.email}
           </Typography>
         );
       },
@@ -46,6 +46,17 @@ const StudentRowColumns = () => {
         return (
           <Typography>
             {x.contact}
+          </Typography>
+        );
+      },
+    },
+    {
+      label: "Role",
+      width: 2,
+      value: (x) => {
+        return (
+          <Typography>
+            {x.role}
           </Typography>
         );
       },
@@ -64,7 +75,24 @@ const StudentRowColumns = () => {
         return <Typography>{formattedDate(new Date(x.createdAt))}</Typography>;
       },
     },
+    {
+      label: "Change Role",
+      width: 2,
+      value: (x) => {
+        return (
+          <Button
+            variant="contained"
+            onClick={()=> {
+              setSelectedUser(x);
+              setChangeRoleDialog(true);
+            }}
+          >
+            Change Role
+          </Button>
+        )
+      }
+    }
   ].filter(Boolean);
 };
 
-export default StudentRowColumns;
+export default UsersRowColumns;

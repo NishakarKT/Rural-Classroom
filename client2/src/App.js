@@ -22,11 +22,14 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Course = lazy(() => import("./pages/Course"));
 const Test = lazy(() => import("./pages/Test"));
 const Auth = lazy(() => import("./pages/Auth"));
+
+const AnalyticsTest = lazy(() => import("./pages/AnalyticsTest"));
+const AdminStudents = lazy(() => import ("./pages/admin/students/index"));
+const AdminPerformance = lazy(() => import ("./pages/admin/performance/index"));
+const AdminAttendance = lazy(() => import ("./pages/admin/attendance/index"));
+const AdminFees = lazy(() => import ("./pages/admin/fees/index"));
+const AdminUsers = lazy(() => import ("./pages/admin/users/index"));
 const Analytics = lazy(() => import("./pages/Analytics"));
-const AdminStudents = lazy(() => import("./pages/admin/students/index"));
-const AdminPerformance = lazy(() => import("./pages/admin/performance/index"));
-const AdminAttendance = lazy(() => import("./pages/admin/attendance/index"));
-const AdminFees = lazy(() => import("./pages/admin/fees/index"));
 
 const Dashboard = () => {
   const [mode, setMode] = useState("light");
@@ -169,6 +172,7 @@ const Dashboard = () => {
                     <Route path="/profile/" element={<Profile />} />
                     {/* admin routes */}
                     <Route path="/admin" element={<Navigate to="/admin/students" replace />} />
+                    <Route path="/admin/users" element={<AdminUsers/>} />
                     <Route path="/admin/students" element={<AdminStudents />} />
                     <Route path="/admin/performance" element={<AdminPerformance />} />
                     <Route path="/admin/attendance" element={<AdminAttendance />} />

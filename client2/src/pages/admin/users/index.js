@@ -1,18 +1,21 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
-import { STUDENT_GET_ENDPOINT } from "../../../constants/endpoints.js";
+import { USER_GET_ENDPOINT } from "../../../constants/endpoints.js";
 import AppContext from "../../../contexts/AppContext.js";
 import axios from "axios";
-import StudentRowColumns from "./StudentRowColumns.js";
 import Table from "../../../components/table/Table.js";
 import AdminHeader from "../../../components/AdminHeader.js";
-import AddStudentDialog from "./AddStudentDialog.js";
+import UsersRowColumns from "./UsersRowColumns.js";
+import ChangeRoleDialog from "./ChangeRoleDialog.js";
+import AddUserDialog from "./AddUserDialog.js";
 
 const Users = () => {
   const data = React.useRef(null);
 
-  const [students, setStudents] = useState([]);
-  const [addStudentDialog,setAddStudentDialog] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [changeRoleDialog,setChangeRoleDialog] = useState(false);
+  const [addUserDialog,setAddUserDialog] = useState(false);
+  const [selectedUser,setSelectedUser] = useState();
   const { token } = useContext(AppContext);
 
   const fetch = () => {
@@ -20,11 +23,11 @@ const Users = () => {
     // fetch course
     try {
       axios
-        .get(STUDENT_GET_ENDPOINT, { headers: { Authorization: "Bearer " + token }, params: { query: JSON.stringify(query) } })
+        .get(USER_GET_ENDPOINT, { headers: { Authorization: "Bearer " + token }, params: { query: JSON.stringify(query) } })
         .then((res) => {
          if (res.data.data?.length){
           data.current = res.data.data;
-          setStudents(res.data.data)
+          setUsers(res.data.data)
          } 
         })
         .catch((err) => console.log(err));
@@ -38,7 +41,7 @@ const Users = () => {
   }, [token]);
 
   const searchAction = (value) => {
-    setStudents(() => {
+    setUsers(() => {
       return (
         data &&
         data.current &&
@@ -51,14 +54,14 @@ const Users = () => {
 
   const searchReset = () => {
     if (data.current && data.current.length > 0) {
-      setStudents(data.current);
+      setUsers(data.current);
     }
   };
   
   return (
     <>
       <AdminHeader
-        title="Students"
+        title="Users"
         searchBar
         searchAction={searchAction}
         searchReset={searchReset}
@@ -72,14 +75,14 @@ const Users = () => {
         sx={{
           ml: 2,
         }}
-        onClick={()=>setAddStudentDialog(true)}
+        onClick={()=>setAddUserDialog(true)}
       >
-        Add Student
+        Add User
       </Button>
-      {students.length > 0 ? (
+      {users.length > 0 ? (
          <Table
-          items={students}
-          columns={StudentRowColumns()}
+          items={users}
+          columns={UsersRowColumns({setChangeRoleDialog,setSelectedUser})}
           header={true}
           rowStyles={{
             cursor: "pointer",
@@ -88,14 +91,20 @@ const Users = () => {
       ) : (
         <Box p={8}>
           <Typography variant="h3" align="center" color="textSecondary">
-            No students yet
+            No users yet
           </Typography>
         </Box>
       )}
-      <AddStudentDialog
-        open={addStudentDialog}
+      <ChangeRoleDialog
+        open={changeRoleDialog}
+        onClose={()=>setChangeRoleDialog(false)}
+        selectedUser={selectedUser}
         fetch={fetch}
-        onClose={()=>setAddStudentDialog(false)}
+      />
+      <AddUserDialog
+        open={addUserDialog}
+        fetch={fetch}
+        onClose={()=>setAddUserDialog(false)}
       />
     </>
   );

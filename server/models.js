@@ -156,6 +156,16 @@ const performanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const feesSchema = new mongoose.Schema({
+  coordinator: { type: String, required: true }, // coordinator _id
+  student: { type: String, required: true }, // student _id
+  amount: { type: Number, required: true },
+  last_date: { type : String, required: true },
+  is_submitted: { type: Boolean },
+},
+{ timestamps: true }
+)
+
 const messageSchema = new mongoose.Schema(
   {
     lecture: { type: String, required: true }, // lecture _id
@@ -181,4 +191,5 @@ export const Performance = new mongoose.model("performance", performanceSchema);
 export const Question = new mongoose.model("question", questionSchema);
 export const Response = new mongoose.model("response", responseSchema);
 export const Material = new mongoose.model("material", materialSchema);
+export const Fees = new mongoose.model("fees", feesSchema);
 export const Message = new mongoose.model("message", messageSchema);

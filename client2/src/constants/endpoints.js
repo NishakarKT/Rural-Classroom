@@ -68,6 +68,13 @@ export const PERFORMANCE_GET_ENDPOINT = BASE + "/performance/get";
 export const PERFORMANCE_NEW_ENDPOINT = BASE + "/performance/new";
 export const PERFORMANCE_EDIT_ENDPOINT = BASE + "/performance/edit";
 export const PERFORMANCE_DELETE_ENDPOINT = BASE + "/performance/delete";
+// analytics 
+export const ANALYTICS_TEST_ENDPOINT = BASE + "/analytics/test";
+// fees
+export const FEES_GET_ENDPOINT = BASE + "/fees/get";
+export const FEES_NEW_ENDPOINT = BASE + "/fees/new";
+export const FEES_EDIT_ENDPOINT = BASE + "/fees/edit";
+export const FEES_DELETE_ENDPOINT = BASE + "/fees/delete";
 // message
 export const MESSAGE_GET_ENDPOINT = BASE + "/message/get";
 export const MESSAGE_NEW_ENDPOINT = BASE + "/message/new";

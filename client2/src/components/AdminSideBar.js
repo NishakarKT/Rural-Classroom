@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 // constants
-import { ADMIN_ATTENDANCE_ROUTE, ADMIN_FEES_ROUTE, ADMIN_PERFORMANCE_ROUTE, ADMIN_STUDENTS_ROUTE, HOME_ROUTE } from "../constants/routes";
+import { ADMIN_ATTENDANCE_ROUTE, ADMIN_FEES_ROUTE, ADMIN_PERFORMANCE_ROUTE, ADMIN_STUDENTS_ROUTE, ADMIN_USERS_ROUTE, HOME_ROUTE } from "../constants/routes";
 // contexts
 import AppContext from "../contexts/AppContext";
 // mui
 import { Drawer as MuiDrawer, Toolbar, List, ListItemIcon, ListItemText, ListItemButton, Divider, IconButton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import styled from "@mui/material/styles/styled";
-import { ChevronLeft, People, ListAlt, Attachment, Assessment, Home } from "@mui/icons-material";
+import { ChevronLeft, People, ListAlt, Attachment, Assessment, Home, AssignmentInd } from "@mui/icons-material";
 // vars
 const drawerWidth = 240;
 
@@ -63,6 +63,12 @@ const AdminSideBar = ({ open, toggleDrawer }) => {
             <Home />
           </ListItemIcon>
           <ListItemText primary="Home" />
+        </ListItemButton>
+        <ListItemButton onClick={() => navigate(ADMIN_USERS_ROUTE)} sx={{ backgroundColor: (location.pathname === ADMIN_USERS_ROUTE ? theme.palette.primary.main : "") + " !important" }}>
+          <ListItemIcon>
+            <AssignmentInd />
+          </ListItemIcon>
+          <ListItemText primary="Users" />
         </ListItemButton>
         <ListItemButton onClick={() => navigate(ADMIN_STUDENTS_ROUTE)} sx={{ backgroundColor: (location.pathname === ADMIN_STUDENTS_ROUTE ? theme.palette.primary.main : "") + " !important" }}>
           <ListItemIcon>
