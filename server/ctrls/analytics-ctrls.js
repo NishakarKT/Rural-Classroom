@@ -1,6 +1,6 @@
-import { Question, Response } from "../models.js";
+import { Attendance, Course, Lecture, Test, User } from "../models.js";
 
-export const get_test = async (req, res) => {
+export const get_mappings = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -9,20 +9,52 @@ export const get_test = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // get attendances
-      const { testId } = req.query;
-      if (testId) {
-        // calculate marks
-        const questions = await Question.find({}, { question: 1, answer: 1 });
-        const responses = await Response.find({ test: testId });
-        const marks = {};
-        responses.forEach((response) => {
-          if (!marks[response.student]) marks[response.student] = 0;
-          marks[response.student] += response.response === questions.find((q) => q._id.toString() === response.question)?.answer;
-        });
-        const data = { marks };
-        res.status(200).send({ data, message: "analytics found" });
-      } else res.status(404).send({ message: "analytics not found" });
+      const coordinators = await User.find({ role: "coordinator" });
+      const courses = await Course.find({});
+      const lectures = await Lecture.find({});
+      const tests = await Test.find({});
+      // generate mappings
+      const courseLectureMapping = {};
+      courses.forEach((course) => (courseLectureMapping[course._id] = { course, data: lectures.filter((lecture) => lecture.course === String(course._id)).map((lecture) => ({ _id: String(lecture._id), name: lecture.name })) }));
+      const courseTestMapping = {};
+      courses.forEach((course) => (courseTestMapping[course._id] = { course, data: tests.filter((test) => test.course === String(course._id)).map((test) => ({ _id: String(test._id), name: test.name })) }));
+      const coordinatorMapping = {};
+      coordinators.forEach((coordinator) => (coordinatorMapping[coordinator._id] = coordinator.name));
+      const lectureMapping = {};
+      lectures.forEach((lecture) => (lectureMapping[lecture._id] = lecture.name));
+      // create data
+      const data = {
+        courseLectureMapping,
+        courseTestMapping,
+        coordinatorMapping,
+        lectureMapping,
+      };
+      res.status(200).send({ data, message: "analytics found" });
+    }
+  } catch (err) {
+    if (res.statusCode < 400) res.status(500);
+    res.send({ message: err.message || "something went wrong" });
+  }
+};
+
+export const get_analytics = async (req, res) => {
+  try {
+    // identify user
+    const user = req.user;
+    // check if user exists
+    if (!user) {
+      res.status(401);
+      throw new Error("unauthorized");
+    } else {
+      const { course, lecture, coordinator, test } = req.body;
+      // attendance
+      const lectureWiseAttendance = {};
+      const lectures = await Lecture.find({ course });
+      const attendances = await Attendance.find({});
+      lectures.forEach((lecture) => (lectureWiseAttendance[String(lecture._id)] = attendances.filter((attendance) => attendance.lecture === String(lecture._id))));
+      // create data
+      const data = { lectureWiseAttendance };
+      res.status(200).send({ data, message: "analytics found" });
     }
   } catch (err) {
     if (res.statusCode < 400) res.status(500);

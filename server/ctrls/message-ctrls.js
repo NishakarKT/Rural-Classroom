@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { Response } from "../models.js";
+import { Message } from "../models.js";
 
-export const get_response = async (req, res) => {
+export const get_message = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -10,13 +10,13 @@ export const get_response = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // get responses
+      // get messages
       const query = JSON.parse(req.query.query) || {};
       // check if _id is present and convert it to ObjectId
       if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
       else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
-      const responses = await Response.find(query);
-      res.status(200).send({ data: responses, message: "responses found" });
+      const messages = await Message.find(query);
+      res.status(200).send({ data: messages, message: "messages found" });
     }
   } catch (err) {
     if (res.statusCode < 400) res.status(500);
@@ -24,7 +24,7 @@ export const get_response = async (req, res) => {
   }
 };
 
-export const new_response = async (req, res) => {
+export const new_message = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -32,15 +32,15 @@ export const new_response = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // create response
+      // create message
       const data = req.body;
-      const result = await new Response(data).save({ new: true });
-      // check if response created
+      const result = await new Message(data).save({ new: true });
+      // check if message created
       if (!result) {
         res.status(403);
-        throw new Error("response not created");
+        throw new Error("message not created");
       } else {
-        res.status(201).send({ data: result, message: "response created" });
+        res.status(201).send({ data: result, message: "message created" });
       }
     }
   } catch (err) {
@@ -49,34 +49,7 @@ export const new_response = async (req, res) => {
   }
 };
 
-// array of new responses
-export const new_responses = async (req, res) => {
-  try {
-    // identify user
-    const user = req.user;
-    if (!user) {
-      res.status(401);
-      throw new Error("unauthorized");
-    } else {
-      // create responses
-      const data = req.body;
-      const result = await Response.insertMany(data);
-      // check if responses created
-      if (!result) {
-        res.status(403);
-        throw new Error("responses not created");
-      } else {
-        res.status(201).send({ data: result, message: "responses created" });
-      }
-    }
-  } catch (err) {
-    if (res.statusCode < 400) res.status(500);
-    console.log(err);
-    res.send({ message: err.message || "something went wrong" });
-  }
-};
-
-export const edit_response = async (req, res) => {
+export const edit_message = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -85,23 +58,23 @@ export const edit_response = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // update users
+      // update messages
       const { query, edits } = req.body;
       if (query) {
         // check if _id is present and convert it to ObjectId
         if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
         else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
-        const result = await Response.updateMany(query, edits, { new: true });
-        // check if response updated
+        const result = await Message.updateMany(query, edits, { new: true });
+        // check if message updated
         if (!result) {
           res.status(404);
-          throw new Error("response not found");
+          throw new Error("message not found");
         } else {
-          res.status(201).send({ data: result, message: "response updated" });
+          res.status(201).send({ data: result, message: "message updated" });
         }
       } else {
         res.status(404);
-        throw new Error("response not found");
+        throw new Error("message not found");
       }
     }
   } catch (err) {
@@ -110,7 +83,7 @@ export const edit_response = async (req, res) => {
   }
 };
 
-export const delete_response = async (req, res) => {
+export const delete_message = async (req, res) => {
   try {
     // identify user
     const user = req.user;
@@ -119,23 +92,23 @@ export const delete_response = async (req, res) => {
       res.status(401);
       throw new Error("unauthorized");
     } else {
-      // delete user
+      // delete message
       const { query } = req.body;
       if (query) {
         // check if _id is present and convert it to ObjectId
         if (typeof query._id === "string") query._id = new mongoose.Types.ObjectId(query._id);
         else if (typeof query._id === "object") Object.keys(query._id).forEach((key) => (query._id[key] = query._id[key].map((_id) => new mongoose.Types.ObjectId(_id))));
-        const result = await Response.deleteMany(query);
-        // check if response deleted
+        const result = await Message.deleteMany(query);
+        // check if message deleted
         if (!result) {
           res.status(404);
-          throw new Error("response not found");
+          throw new Error("message not found");
         } else {
-          res.status(202).send({ data: result, message: "response deleted" });
+          res.status(202).send({ data: result, message: "message deleted" });
         }
       } else {
         res.status(404);
-        throw new Error("response not found");
+        throw new Error("message not found");
       }
     }
   } catch (err) {

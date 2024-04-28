@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 // constants
-import { ADMIN_ROUTE, AUTH_ROUTE, HOME_ROUTE } from "../constants/routes";
+import { ADMIN_ROUTE, AUTH_ROUTE, HOME_ROUTE, ANALYTICS_ROUTE } from "../constants/routes";
 // contexts
 import AppContext from "../contexts/AppContext";
 // mui
 import { Drawer as MuiDrawer, Toolbar, List, ListItemIcon, ListItemText, ListItemButton, Divider, IconButton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import styled from "@mui/material/styles/styled";
-import { Home, ChevronLeft, AccountCircle, AdminPanelSettings } from "@mui/icons-material";
+import { Home, ChevronLeft, AccountCircle, AdminPanelSettings, Insights } from "@mui/icons-material";
 // vars
 const drawerWidth = 240;
 
@@ -66,6 +66,12 @@ const SideBar = ({ open, toggleDrawer }) => {
               </ListItemIcon>
               <ListItemText primary="Home" />
             </ListItemButton>
+            <ListItemButton onClick={() => navigate(ANALYTICS_ROUTE)} sx={{ backgroundColor: (location.pathname === ANALYTICS_ROUTE ? theme.palette.primary.main : "") + " !important" }}>
+              <ListItemIcon>
+                <Insights />
+              </ListItemIcon>
+              <ListItemText primary="Home" />
+            </ListItemButton>
           </>
         ) : (
           <>
@@ -77,7 +83,7 @@ const SideBar = ({ open, toggleDrawer }) => {
             </ListItemButton>
           </>
         )}
-        {user && user.role==='admin' && (
+        {user && user.role === "admin" && (
           <>
             <ListItemButton onClick={() => navigate(ADMIN_ROUTE)}>
               <ListItemIcon>

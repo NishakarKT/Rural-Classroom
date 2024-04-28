@@ -22,8 +22,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const Home = () => {
   const coursePicRef = useRef(null);
   const testPicRef = useRef(null);
-  const { user, token, courses, setCourses, tests, setTests } = useContext(AppContext);
+  const { user, token, courses, setCourses, lectures, tests, setTests } = useContext(AppContext);
   const [courseId, setCourseId] = useState(null);
+  const [course, setCourse] = useState(null);
   const [testId, setTestId] = useState(null);
   const [coursePic, setCoursePic] = useState(null);
   const [testPic, setTestPic] = useState(null);
@@ -92,6 +93,7 @@ const Home = () => {
       edits["teacher"] = user._id;
       edits["date"] = new Date().toISOString();
       edits["course"] = courses.find((c) => c.name === edits.course)._id;
+      edits["lecture"] = lectures.find((l) => l.name === edits.lecture)._id;
       if (testPic) {
         const picData = new FormData();
         const fileName = user.role + "." + user.email + ".test." + edits.name + "." + testPic.name.split(".").at(-1);
@@ -174,16 +176,18 @@ const Home = () => {
                 </Button>
               ) : null}
             </Stack>
-            <Carousel showIndicators={false} showStatus={false} showThumbs={false}>
+            <Carousel autoPlay infiniteLoop showIndicators={false} showStatus={false} showThumbs={false}>
               {courses && courses.length ? (
                 courses
                   .filter((c, i) => i % 4 === 0)
                   .map((course, index) => (
-                    <Stack key={course._id} direction="row" spacing={2} px={6} py={2}>
+                    <Grid container sx={{ px: { xs: 2, sm: 6 }, py: 2 }} spacing={2}>
                       {courses.slice(index * 4, index * 4 + 4).map((course, idx) => (
-                        <CourseCard key={course._id + index * 4 + idx} course={course} />
+                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                          <CourseCard key={course._id + index * 4 + idx} course={course} />
+                        </Grid>
                       ))}
-                    </Stack>
+                    </Grid>
                   ))
               ) : (
                 <Typography color="text.secondary" component="p" variant="h6" sx={{ py: 4 }} gutterBottom>
@@ -207,16 +211,18 @@ const Home = () => {
                 </Button>
               ) : null}
             </Stack>
-            <Carousel showIndicators={false} showStatus={false} showThumbs={false}>
+            <Carousel autoPlay infiniteLoop showIndicators={false} showStatus={false} showThumbs={false}>
               {tests && tests.length ? (
                 tests
                   .filter((c, i) => i % 4 === 0)
                   .map((test, index) => (
-                    <Stack key={test._id} direction="row" spacing={2} px={6} py={2}>
+                    <Grid container sx={{ px: { xs: 2, sm: 6 }, py: 2 }} spacing={2}>
                       {tests.slice(index * 4, index * 4 + 4).map((test, idx) => (
-                        <TestCard key={test._id + index * 4 + idx} test={test} />
+                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                          <TestCard key={test._id + index * 4 + idx} test={test} />
+                        </Grid>
                       ))}
-                    </Stack>
+                    </Grid>
                   ))
               ) : (
                 <Typography color="text.secondary" component="p" variant="h6" sx={{ py: 4 }} gutterBottom>
@@ -275,7 +281,7 @@ const Home = () => {
           </Grid>
         </form>
       </Dialog>
-      <Dialog open={!!testId} onClose={handleCloseTest} TransitionComponent={Transition}>
+      <Dialog open={testId} onClose={handleCloseTest} TransitionComponent={Transition}>
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
             <Typography sx={{ flex: 1 }} variant="h6" component="div">
@@ -290,11 +296,14 @@ const Home = () => {
           <Grid container p={2} spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <TextField required name="name" label="Name" fullWidth variant="standard" />
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Autocomplete name="course" options={courses} getOptionLabel={(option) => option.name} renderInput={(params) => <TextField {...params} required name="course" label="Course" variant="standard" />} />
+                <Grid item xs={12} sm={4}>
+                  <Autocomplete name="course" onChange={(e, value) => setCourse(value)} options={courses} getOptionLabel={(option) => option.name} renderInput={(params) => <TextField {...params} required name="course" label="Course" variant="standard" />} />
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Autocomplete name="lecture" options={lectures.filter((lecture) => lecture.course === course?._id)} getOptionLabel={(option) => option.name} renderInput={(params) => <TextField {...params} required name="lecture" label="Lecture" variant="standard" />} />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField required multiline rows={4} name="description" label="Description" fullWidth variant="outlined" />

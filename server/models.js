@@ -90,6 +90,7 @@ const testSchema = new mongoose.Schema(
     syllabus: { type: String, required: true },
     teacher: { type: String, required: true }, // teacher's _id
     course: { type: String, required: true }, // course _id
+    lecture: { type: String, required: true }, // lecture _id
     date: { type: String, required: true }, // ISO string
     testPic: { type: String }, // path to file
     questions: [{ type: String, required: true }], // question _ids
@@ -113,7 +114,7 @@ const lectureSchema = new mongoose.Schema(
     description: { type: String, required: true },
     date: { type: String, required: true },
     course: { type: String, required: true }, // course _id
-    url: { type: String }, // path to stream
+    youtubeId: { type: String }, // youtube video id
   },
   { timestamps: true }
 );
@@ -123,6 +124,7 @@ const attendanceSchema = new mongoose.Schema(
     coordinator: { type: String, required: true }, // coordinator _id
     lecture: { type: String, required: true }, // lecture _id
     attendance: [{ type: String, required: true }], // student _ids
+    percentage: { type: String, required: true }, // attendance percentage
   },
   { timestamps: true }
 );
@@ -164,6 +166,18 @@ const feesSchema = new mongoose.Schema({
 { timestamps: true }
 )
 
+const messageSchema = new mongoose.Schema(
+  {
+    lecture: { type: String, required: true }, // lecture _id
+    course: { type: String, required: true }, // course _id
+    date: { type: String, required: true }, // date-time ISO string
+    text: { type: String, required: true }, // message text
+    from: { type: String, required: true }, // user _id
+    fromName: { type: String, required: true }, // user name
+  },
+  { timestamps: true }
+);
+
 export const Otp = new mongoose.model("otp", otpSchema);
 export const User = new mongoose.model("user", userSchema);
 export const Student = new mongoose.model("student", studentSchema);
@@ -178,3 +192,4 @@ export const Question = new mongoose.model("question", questionSchema);
 export const Response = new mongoose.model("response", responseSchema);
 export const Material = new mongoose.model("material", materialSchema);
 export const Fees = new mongoose.model("fees", feesSchema);
+export const Message = new mongoose.model("message", messageSchema);

@@ -9,5 +9,4 @@ export const ADMIN_STUDENTS_ROUTE = "/admin/students";
 export const ADMIN_PERFORMANCE_ROUTE = "/admin/performance";
 export const ADMIN_ATTENDANCE_ROUTE = "/admin/attendance";
 export const ADMIN_FEES_ROUTE = "/admin/fees";
-export const ANALYTICS_TEST_ROUTE = "/analytics/test";
-export const ANALYTICS_COURSE_ROUTE = "/analytics/course";
+export const ANALYTICS_ROUTE = "/analytics";

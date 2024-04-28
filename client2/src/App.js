@@ -4,7 +4,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet";
 // constants
 import { LOCALSTORAGE, COMPANY } from "./constants/vars";
-import { AUTH_TOKEN_ENDPOINT, COURSE_GET_ENDPOINT, TEST_GET_ENDPOINT } from "./constants/endpoints";
+import { AUTH_TOKEN_ENDPOINT, COURSE_GET_ENDPOINT, TEST_GET_ENDPOINT, LECTURE_GET_ENDPOINT } from "./constants/endpoints";
 // components
 import Loader from "./components/Loader";
 import NavBar from "./components/NavBar";
@@ -22,33 +22,36 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Course = lazy(() => import("./pages/Course"));
 const Test = lazy(() => import("./pages/Test"));
 const Auth = lazy(() => import("./pages/Auth"));
+
 const AnalyticsTest = lazy(() => import("./pages/AnalyticsTest"));
 const AdminStudents = lazy(() => import ("./pages/admin/students/index"));
 const AdminPerformance = lazy(() => import ("./pages/admin/performance/index"));
 const AdminAttendance = lazy(() => import ("./pages/admin/attendance/index"));
 const AdminFees = lazy(() => import ("./pages/admin/fees/index"));
 const AdminUsers = lazy(() => import ("./pages/admin/users/index"));
+const Analytics = lazy(() => import("./pages/Analytics"));
 
 const Dashboard = () => {
   const [mode, setMode] = useState("light");
   const [token, setToken] = useState(null);
   const [user, setUser] = useState({});
   const [courses, setCourses] = useState([]);
+  const [lectures, setLectures] = useState([]);
   const [tests, setTests] = useState([]);
   const [open, setOpen] = useState(false);
-  const [showAdminSideBar, setShowAdminSideBar]= useState(false);
+  const [showAdminSideBar, setShowAdminSideBar] = useState(false);
   const location = useLocation();
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  useEffect(()=>{
-    if(location.pathname.includes('/admin')){
-      setShowAdminSideBar(true)
+  useEffect(() => {
+    if (location.pathname.includes("/admin")) {
+      setShowAdminSideBar(true);
     } else {
       setShowAdminSideBar(false);
     }
-  },[location.pathname]);
+  }, [location.pathname]);
 
   useEffect(() => {
     const localData = JSON.parse(localStorage.getItem(LOCALSTORAGE)) || {};
@@ -92,6 +95,19 @@ const Dashboard = () => {
             console.log("Something went wrong! Courses couldn't be fetched.");
           });
       }
+      // fetch lectures
+      {
+        const query = {};
+        query["course"] = { $in: user.courses };
+        axios
+          .get(LECTURE_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
+          .then((res) => {
+            setLectures(res.data.data);
+          })
+          .catch((err) => {
+            console.log("Something went wrong! Courses couldn't be fetched.");
+          });
+      }
       // fetch tests
       {
         const query = {};
@@ -124,7 +140,7 @@ const Dashboard = () => {
   const theme = createTheme({ palette: { mode } });
   return (
     <ThemeProvider theme={theme}>
-      <AppContext.Provider value={{ mode, handleMode, user, setUser, token, setToken, courses, setCourses, tests, setTests }}>
+      <AppContext.Provider value={{ mode, handleMode, user, setUser, token, setToken, courses, setCourses, lectures, setLectures, tests, setTests }}>
         <Helmet>
           <title>{COMPANY}</title>
         </Helmet>
@@ -133,8 +149,8 @@ const Dashboard = () => {
         </SpeedDial>
         <Box sx={{ display: "flex" }}>
           <NavBar open={open} toggleDrawer={toggleDrawer} />
-          {!showAdminSideBar && (<SideBar open={open} toggleDrawer={toggleDrawer} />)}
-          {showAdminSideBar && (<AdminSideBar open={open} toggleDrawer={toggleDrawer} />)}
+          {!showAdminSideBar && <SideBar open={open} toggleDrawer={toggleDrawer} />}
+          {showAdminSideBar && <AdminSideBar open={open} toggleDrawer={toggleDrawer} />}
           <Box
             component="main"
             sx={{
@@ -150,49 +166,17 @@ const Dashboard = () => {
                 {user ? (
                   <>
                     {!isProfileComplete(user) ? <Route path="/*" element={<Profile />} /> : null}
-                    <Route path="/analytics/test/:testId" element={<AnalyticsTest />} />
+                    <Route path="/analytics" element={<Analytics />} />
                     <Route path="/course/:courseId" element={<Course />} />
                     <Route path="/test/:testId" element={<Test />} />
                     <Route path="/profile/" element={<Profile />} />
-
                     {/* admin routes */}
-                    <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
-
-                    <Route
-                      path="/admin/users"
-                      element={
-                        <AdminUsers/>
-                      }
-                    />
-
-                    <Route
-                      path="/admin/students"
-                      element={
-                        <AdminStudents />
-                      }
-                    />
-
-                    <Route
-                      path="/admin/performance"
-                      element={
-                        <AdminPerformance />
-                      }
-                    />
-
-                    <Route
-                      path="/admin/attendance"
-                      element={
-                        <AdminAttendance/>
-                      }
-                    />
-
-                    <Route
-                      path="/admin/fees"
-                      element={
-                        <AdminFees/>
-                      }
-                    />
-
+                    <Route path="/admin" element={<Navigate to="/admin/students" replace />} />
+                    <Route path="/admin/users" element={<AdminUsers/>} />
+                    <Route path="/admin/students" element={<AdminStudents />} />
+                    <Route path="/admin/performance" element={<AdminPerformance />} />
+                    <Route path="/admin/attendance" element={<AdminAttendance />} />
+                    <Route path="/admin/fees" element={<AdminFees />} />
                     <Route path="/*" element={<Home />} />
                   </>
                 ) : (

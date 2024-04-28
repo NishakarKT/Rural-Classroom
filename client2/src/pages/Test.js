@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import { Helmet } from "react-helmet";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Webcam from "react-webcam";
 import Draggable from "react-draggable";
 // constants
 import { COMPANY } from "../constants/vars";
-import { ANALYTICS_TEST_ROUTE } from "../constants/routes";
 import { TEST_GET_ENDPOINT, TEST_EDIT_ENDPOINT, QUESTION_NEW_ENDPOINT, QUESTION_GET_ENDPOINT, QUESTION_EDIT_ENDPOINT, RESPONSE_NEWS_ENDPOINT } from "../constants/endpoints";
 // contexts
 import AppContext from "../contexts/AppContext";
@@ -16,7 +15,7 @@ import { getResponsesFromImage } from "../apis/multimedia";
 // mui
 import { Container, Grid, Paper, TextField, Typography, List, ListItemText, ListItemButton, Stack, Button, Box, IconButton, Dialog, DialogContent, DialogTitle, CardMedia } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { Add, Edit, Upload, Camera, Close, Insights } from "@mui/icons-material";
+import { Add, Edit, Upload, Camera, Close } from "@mui/icons-material";
 // vars
 const questionTemplate = {
   question: "",
@@ -40,7 +39,6 @@ function PaperComponent(props) {
 }
 
 const Test = () => {
-  const navigate = useNavigate();
   const { testId } = useParams();
   const myStreamRef = useRef(null);
   const { token, user } = useContext(AppContext);
@@ -138,8 +136,8 @@ const Test = () => {
               setQuestions((questions) => [res.data.data, ...questions]);
               axios
                 .patch(TEST_EDIT_ENDPOINT, { query: { _id: testId }, edits: { questions: [...test.questions, res.data.data._id] } }, { headers: { Authorization: `Bearer ${token}` } })
-                .then((res) => {
-                  setTest((test) => ({ ...test, questions: [...test.questions, res.data.data] }));
+                .then(() => {
+                  setTest((test) => ({ ...test, questions: [...test.questions, res.data.data._id] }));
                   e.target.reset();
                   setIsLoading(false);
                 })
@@ -196,9 +194,6 @@ const Test = () => {
               <Typography color="primary" variant="h6" flex={1} gutterBottom>
                 Test
               </Typography>
-              <Button variant="contained" startIcon={<Insights />} onClick={() => navigate(ANALYTICS_TEST_ROUTE + "/" + testId)}>
-                Analytics
-              </Button>
             </Stack>
             {user?.role === "teacher" ? (
               <form onSubmit={handleQuestion}>
@@ -219,10 +214,10 @@ const Test = () => {
                     <TextField fullWidth value={question.options?.length >= 4 ? question.options[3].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 3 ? { ...option, value: e.target.value } : option)) }))} name="o4" label="Option 4" variant="outlined" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth value={question.options?.length >= 5 ? question.options[4].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 4 ? { ...option, value: e.target.value } : option)) }))} name="o5" label="Option 4" variant="outlined" />
+                    <TextField fullWidth value={question.options?.length >= 5 ? question.options[4].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 4 ? { ...option, value: e.target.value } : option)) }))} name="o5" label="Option 5" variant="outlined" />
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <TextField fullWidth value={question.options?.length >= 6 ? question.options[5].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 5 ? { ...option, value: e.target.value } : option)) }))} name="o6" label="Option 4" variant="outlined" />
+                    <TextField fullWidth value={question.options?.length >= 6 ? question.options[5].value : ""} onChange={(e) => setQuestion((question) => ({ ...question, options: question.options.map((option, index) => (index === 5 ? { ...option, value: e.target.value } : option)) }))} name="o6" label="Option 6" variant="outlined" />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField required fullWidth value={question.answer} onChange={(e) => setQuestion((question) => ({ ...question, answer: e.target.value }))} name="answer" label="Answer" variant="outlined" />
