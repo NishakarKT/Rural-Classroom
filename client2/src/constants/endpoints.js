@@ -1,5 +1,5 @@
-export const BASE = "http://localhost:8000";
-// export const BASE = "https://ruralclassroom.onrender.com";
+// export const BASE = "http://localhost:8000";
+export const BASE = "https://ruralclassroom.onrender.com";
 // file
 export const FILE_UPLOAD_ENDPOINT = BASE + "/file/upload";
 // auth

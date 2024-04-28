@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Attendance, Course, Fees, Lecture, Student, User } from "../models.js";
+import { Fees, Student, User } from "../models.js";
 
 export const get_fees = async (req, res) => {
   try {

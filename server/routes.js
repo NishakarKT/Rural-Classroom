@@ -100,8 +100,6 @@ Router.get("/message/get", isAuthenticated, messageCtrls.get_message);
 Router.post("/message/new", isAuthenticated, messageCtrls.new_message);
 Router.patch("/message/edit", isAuthenticated, messageCtrls.edit_message);
 Router.delete("/message/delete", isAuthenticated, messageCtrls.delete_message);
-// Analytics Routes
-Router.get("/analytics/test", isAuthenticated, analyticsCtrls.get_test);
 // Fees Routes
 Router.get("/fees/get", isAuthenticated, feesCtrls.get_fees);
 Router.post("/fees/new", isAuthenticated, feesCtrls.new_fees);
