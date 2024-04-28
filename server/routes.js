@@ -19,6 +19,7 @@ import * as questionCtrls from "./ctrls/question-ctrls.js";
 import * as responseCtrls from "./ctrls/response-ctrls.js";
 import * as materialCtrls from "./ctrls/material-ctrls.js";
 import * as analyticsCtrls from "./ctrls/analytics-ctrls.js";
+import * as feesCtrls from "./ctrls/fees-ctrls.js";
 
 const Router = express.Router();
 
@@ -95,5 +96,10 @@ Router.delete("/performance/delete", isAuthenticated, performanceCtrls.delete_pe
 Router.delete("/calendar/delete", isAuthenticated, calendarCtrls.delete_calendar);
 // Analytics Routes
 Router.get("/analytics/test", isAuthenticated, analyticsCtrls.get_test);
+// Fees Routes
+Router.get("/fees/get", isAuthenticated, feesCtrls.get_fees);
+Router.post("/fees/new", isAuthenticated, feesCtrls.new_fees);
+Router.patch("/fees/edit", isAuthenticated, feesCtrls.edit_fees);
+Router.delete("/fees/delete", isAuthenticated, feesCtrls.delete_fees);
 
 export default Router;

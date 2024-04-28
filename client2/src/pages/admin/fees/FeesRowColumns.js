@@ -22,48 +22,73 @@ const FeesRowColumns = () => {
               src={x.profilePic}
             />
             <Typography>
-              {x.name}
+              {x.student.name}
             </Typography>
           </Box>
         );
       },
     },
     {
-      label: "Fees Paid",
+      label: "Coordinator name",
+      width: 2,
+      value: (x) => {
+        return (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: "row",
+              width: "100%",
+              alignItems: "center",
+              cursor: "pointer",
+            }}
+          >
+            <Avatar
+              sx={{ width: 32, height: 32, mr: 1 }}
+              src={x.profilePic}
+            />
+            <Typography>
+              {x.coordinator.name}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      label: "Amount",
       width: 2,
       value: (x) => {
         return (
           <Typography >
-            {`₹${x.feesPaid}`}
+            {`₹${x.amount}`}
           </Typography>
         );
       },
     },
     {
-      label: "Fees Due",
+      label: "Is paid",
       width: 2,
       value: (x) => {
         return (
-          <Typography>
-            {`₹${x.feesDue}`}
+          <Typography >
+            {x.is_submitted ? "Yes" : "No"}
           </Typography>
         );
       },
     },
-    // {
-    //   label: "Last Updated",
-    //   width: 2,
-    //   value: (x) => {
-    //     return <Typography>{formattedDate(new Date(x.updatedAt))}</Typography>;
-    //   },
-    // },
-    // {
-    //   label: "Date joined",
-    //   width: 2,
-    //   value: (x) => {
-    //     return <Typography>{formattedDate(new Date(x.createdAt))}</Typography>;
-    //   },
-    // },
+    {
+      label: "Last Submission date",
+      width: 2,
+      value: (x) => {
+        return <Typography>{formattedDate(new Date(x.last_date))}</Typography>;
+      },
+    },
+    {
+      label: "Created on",
+      width: 2,
+      value: (x) => {
+        return <Typography>{formattedDate(new Date(x.createdAt))}</Typography>;
+      },
+    },
   ].filter(Boolean);
 };
 

@@ -27,6 +27,7 @@ const AdminStudents = lazy(() => import ("./pages/admin/students/index"));
 const AdminPerformance = lazy(() => import ("./pages/admin/performance/index"));
 const AdminAttendance = lazy(() => import ("./pages/admin/attendance/index"));
 const AdminFees = lazy(() => import ("./pages/admin/fees/index"));
+const AdminUsers = lazy(() => import ("./pages/admin/users/index"));
 
 const Dashboard = () => {
   const [mode, setMode] = useState("light");
@@ -155,7 +156,14 @@ const Dashboard = () => {
                     <Route path="/profile/" element={<Profile />} />
 
                     {/* admin routes */}
-                    <Route path="/admin" element={<Navigate to="/admin/students" replace />} />
+                    <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
+
+                    <Route
+                      path="/admin/users"
+                      element={
+                        <AdminUsers/>
+                      }
+                    />
 
                     <Route
                       path="/admin/students"

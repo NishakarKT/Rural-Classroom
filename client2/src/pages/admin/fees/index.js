@@ -1,35 +1,41 @@
-import { Box, Typography } from "@mui/material";
-import React, { useContext, useState } from "react";
+import { Box, Button, Typography } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
 import AppContext from "../../../contexts/AppContext.js";
 import axios from "axios";
 import Table from "../../../components/table/Table.js";
 import AdminHeader from "../../../components/AdminHeader.js";
-import { FeesColumns } from "./FeesColumns.js";
 import FeesRowColumns from "./FeesRowColumns.js";
+import { FEES_GET_ENDPOINT } from "../../../constants/endpoints.js";
+import AddFeesDialog from "./AddFeesDialog.js";
 
 const Fees = () => {
   const data = React.useRef(null);
 
-  const [fees, setFees] = useState(FeesColumns);
+  const [fees, setFees] = useState();
+  const [addFeesDialog,setAddFeesDialog] = useState(false);
   const { token } = useContext(AppContext);
 
-  // useEffect(() => {
-  //   const query = {};
-  //   // fetch course
-  //   try {
-  //     axios
-  //       .get(STUDENT_GET_ENDPOINT, { headers: { Authorization: "Bearer " + token }, params: { query: JSON.stringify(query) } })
-  //       .then((res) => {
-  //        if (res.data.data?.length){
-  //         data.current = res.data.data;
-  //         setFees(res.data.data)
-  //        } 
-  //       })
-  //       .catch((err) => console.log(err));
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }, [token]);
+  const fetch = () => {
+    const query = {};
+    // fetch fees
+    try {
+      axios
+        .get(FEES_GET_ENDPOINT, { headers: { Authorization: "Bearer " + token }, params: { query: JSON.stringify(query) } })
+        .then((res) => {
+         if (res.data.data?.length){
+          data.current = res.data.data;
+          setFees(res.data.data)
+         } 
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  
+  useEffect(() => {
+   fetch();
+  }, [token]);
 
   const searchAction = (value) => {
     setFees(() => {
@@ -52,7 +58,7 @@ const Fees = () => {
   return (
     <>
       <AdminHeader
-        title="Students"
+        title="Fees"
         searchBar
         searchAction={searchAction}
         searchReset={searchReset}
@@ -60,8 +66,18 @@ const Fees = () => {
           px: 3,
         }}
       />
-      {fees.length > 0 ? (
-         <Table
+      <Button
+        variant="outlined"
+        color="primary"
+        sx={{
+          ml: 2,
+        }}
+        onClick={()=>setAddFeesDialog(true)}
+      >
+        Add Fees
+      </Button>
+      {fees && fees.length > 0 ? (
+          <Table
           items={fees}
           columns={FeesRowColumns()}
           header={true}
@@ -69,13 +85,18 @@ const Fees = () => {
             cursor: "pointer",
           }}
         />
-      ) : (
+       ) : (
         <Box p={8}>
           <Typography variant="h3" align="center" color="textSecondary">
             No fees yet
           </Typography>
         </Box>
       )}
+      <AddFeesDialog
+        open={addFeesDialog}
+        fetch={fetch}
+        onClose={()=>setAddFeesDialog(false)}
+      />
     </>
   );
 };

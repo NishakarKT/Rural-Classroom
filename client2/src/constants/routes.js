@@ -4,6 +4,7 @@ export const COURSE_ROUTE = "/course";
 export const TEST_ROUTE = "/test";
 export const AUTH_ROUTE = "/auth";
 export const ADMIN_ROUTE = "/admin";
+export const ADMIN_USERS_ROUTE = "/admin/users";
 export const ADMIN_STUDENTS_ROUTE = "/admin/students";
 export const ADMIN_PERFORMANCE_ROUTE = "/admin/performance";
 export const ADMIN_ATTENDANCE_ROUTE = "/admin/attendance";
