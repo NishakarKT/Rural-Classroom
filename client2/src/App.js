@@ -23,7 +23,6 @@ const Course = lazy(() => import("./pages/Course"));
 const Test = lazy(() => import("./pages/Test"));
 const Auth = lazy(() => import("./pages/Auth"));
 
-const AnalyticsTest = lazy(() => import("./pages/AnalyticsTest"));
 const AdminStudents = lazy(() => import ("./pages/admin/students/index"));
 const AdminPerformance = lazy(() => import ("./pages/admin/performance/index"));
 const AdminAttendance = lazy(() => import ("./pages/admin/attendance/index"));

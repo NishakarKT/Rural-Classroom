@@ -240,7 +240,8 @@ const Course = () => {
   }, [attendance]);
 
   useEffect(() => {
-    if (responses?.length) handleResponses();
+    console.log(responses);
+    // if (responses?.length) handleResponses();
   }, [responses]);
 
   const captureImage = () => {
@@ -431,13 +432,15 @@ const Course = () => {
   };
 
   const handleResponsesCapture = async () => {
-    setIsLoading(true);
-    const capturedImage = myStreamRef.current.getScreenshot();
-    const imageBlob = await fetch(capturedImage).then((r) => r.blob());
-    const responses = await getResponsesFromImage(imageBlob);
-    const processedResponses = responses.map((response) => ({ test: test?._id, question: testQuestion._id, student: user?._id + "_" + response.roll, response: testQuestion.options.find((q) => q.key === response.response)?.value }));
-    setResponses(processedResponses);
-    setIsLoading(false);
+    if(test && testQuestion){
+      setIsLoading(true);
+      const capturedImage = myStreamRef.current.getScreenshot();
+      const imageBlob = await fetch(capturedImage).then((r) => r.blob());
+      const responses = await getResponsesFromImage(imageBlob);
+      const processedResponses = responses.map((response) => ({ test: test?._id, question: testQuestion._id, student: user?._id + "_" + response.roll, response: testQuestion.options.find((q) => q.key === response.response)?.value })).filter(response => response.response && response.student);
+      setResponses(processedResponses);
+      setIsLoading(false);
+    }
   };
 
   return (
