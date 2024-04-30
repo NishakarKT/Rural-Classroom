@@ -134,7 +134,6 @@ const Course = () => {
         axios
           .get(DOUBT_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
           .then((res) => {
-            console.log(res.data.data);
             if (res.data.data.length) {
               const processedDoubts = [{ doubts: 0, time: 0 }];
               const doubts = res.data.data.map((doubt) => ({ doubts: Number(doubt.doubts), time: Number(doubt.time).toFixed(1) }));
@@ -248,8 +247,8 @@ const Course = () => {
   }, [course]);
 
   useEffect(() => {
-    socket.on("doubts", ({ doubts, date }) => {
-      setChartData((prev) => [...prev, { doubts, time: new Date(date).toLocaleTimeString() }]);
+    socket.on("doubts", ({ doubts, time }) => {
+      setChartData((prev) => [...prev, { doubts, time: Number(time).toFixed(1) }, {doubts: 0, time: (Number(time) + 0.1).toFixed(1)}]);
     });
     socket.on("message", ({ from, fromName, text, date }) => {
       setMessages((messages) => [...messages, { from, fromName, text, date }]);
@@ -392,7 +391,7 @@ const Course = () => {
   const handleDoubts = async (doubts) => {
     if (youtubeRef.current && youtubeRef.current.internalPlayer) {
       const time = await youtubeRef.current.internalPlayer.getCurrentTime();
-      socket.emit("doubts", { room: courseId, doubts });
+      socket.emit("doubts", { room: courseId, doubts, time });
       setDoubtsOpen(false);
       setCapturedImage(null);
       alert("Doubts have been raised!");

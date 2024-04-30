@@ -35,8 +35,8 @@ io.on("connection", (socket) => {
     socket.join(room);
   });
   // handle doubts
-  socket.on("doubts", ({ room, doubts }) => {
-    io.to(room).emit("doubts", { doubts, date: new Date().toISOString() });
+  socket.on("doubts", ({ room, doubts, time }) => {
+    io.to(room).emit("doubts", { doubts, time});
   });
   // handle messages
   socket.on("message", ({ room, from, fromName, text }) => {
