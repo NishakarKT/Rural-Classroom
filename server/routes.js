@@ -20,6 +20,7 @@ import * as responseCtrls from "./ctrls/response-ctrls.js";
 import * as materialCtrls from "./ctrls/material-ctrls.js";
 import * as analyticsCtrls from "./ctrls/analytics-ctrls.js";
 import * as feesCtrls from "./ctrls/fees-ctrls.js";
+import * as doubtCtrls from "./ctrls/doubt-ctrls.js";
 import * as messageCtrls from "./ctrls/message-ctrls.js";
 
 const Router = express.Router();
@@ -95,7 +96,7 @@ Router.post("/performance/new", isAuthenticated, performanceCtrls.new_performanc
 Router.patch("/performance/edit", isAuthenticated, performanceCtrls.edit_performance);
 Router.delete("/performance/delete", isAuthenticated, performanceCtrls.delete_performance);
 Router.delete("/calendar/delete", isAuthenticated, calendarCtrls.delete_calendar);
-// Mesage Routes
+// Message Routes
 Router.get("/message/get", isAuthenticated, messageCtrls.get_message);
 Router.post("/message/new", isAuthenticated, messageCtrls.new_message);
 Router.patch("/message/edit", isAuthenticated, messageCtrls.edit_message);
@@ -105,6 +106,11 @@ Router.get("/fees/get", isAuthenticated, feesCtrls.get_fees);
 Router.post("/fees/new", isAuthenticated, feesCtrls.new_fees);
 Router.patch("/fees/edit", isAuthenticated, feesCtrls.edit_fees);
 Router.delete("/fees/delete", isAuthenticated, feesCtrls.delete_fees);
+// Doubt Routes
+Router.get("/doubt/get", isAuthenticated, doubtCtrls.get_doubt);
+Router.post("/doubt/new", isAuthenticated, doubtCtrls.new_doubt);
+Router.patch("/doubt/edit", isAuthenticated, doubtCtrls.edit_doubt);
+Router.delete("/doubt/delete", isAuthenticated, doubtCtrls.delete_doubt);
 // Analytics
 Router.post("/analytics/get", isAuthenticated, analyticsCtrls.get_analytics);
 Router.get("/analytics/mappings", isAuthenticated, analyticsCtrls.get_mappings);

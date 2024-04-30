@@ -178,6 +178,16 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+export const doubtSchema = new mongoose.Schema(
+  {
+    lecture: { type: String, required: true }, // lecture _id
+    course: { type: String, required: true }, // course _id
+    doubts: { type: String, required: true }, // number of doubts
+    time: { type: String, required: true }, // timestamp (in seconds)
+  },
+  { timestamps: true }
+);
+
 export const Otp = new mongoose.model("otp", otpSchema);
 export const User = new mongoose.model("user", userSchema);
 export const Student = new mongoose.model("student", studentSchema);
@@ -193,3 +203,4 @@ export const Response = new mongoose.model("response", responseSchema);
 export const Material = new mongoose.model("material", materialSchema);
 export const Fees = new mongoose.model("fees", feesSchema);
 export const Message = new mongoose.model("message", messageSchema);
+export const Doubt = new mongoose.model("doubt", doubtSchema);

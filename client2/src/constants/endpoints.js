@@ -80,6 +80,11 @@ export const MESSAGE_GET_ENDPOINT = BASE + "/message/get";
 export const MESSAGE_NEW_ENDPOINT = BASE + "/message/new";
 export const MESSAGE_EDIT_ENDPOINT = BASE + "/message/edit";
 export const MESSAGE_DELETE_ENDPOINT = BASE + "/message/delete";
+// doubt
+export const DOUBT_GET_ENDPOINT = BASE + "/doubt/get";
+export const DOUBT_NEW_ENDPOINT = BASE + "/doubt/new";
+export const DOUBT_EDIT_ENDPOINT = BASE + "/doubt/edit";
+export const DOUBT_DELETE_ENDPOINT = BASE + "/doubt/delete";
 // analytics
 export const ANALYTICS_GET_ENDPOINT = BASE + "/analytics/get";
 export const ANALYTICS_MAPPINGS_ENDPOINT = BASE + "/analytics/mappings";

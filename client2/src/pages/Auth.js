@@ -19,7 +19,7 @@ import { VIDEOS_AUTH_MP4 } from "../constants/videos";
 
 const AuthUser = () => {
   const navigate = useNavigate();
-  const { mode, setToken, setUser } = useContext(AppContext);
+  const { mode, setToken } = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isGglLoading, setIsGglLoading] = useState(false);
   const [emailErr, setEmailErr] = useState("");
@@ -178,7 +178,7 @@ const AuthUser = () => {
                 </Stack>
               </Stack>
             </Grid>
-            <Grid item sm={12} md={6} lg={4}>
+            <Grid item sm={12} md={6} lg={4} sx={{ width: "100%" }}>
               <Stack flex={1} px={2} spacing={1} justifyContent="center" sx={{ height: "100%", backgroundColor: (theme) => (mode === "dark" ? theme.palette.grey[900] : theme.palette.grey[100]) }}>
                 <Stack direction="row" alignItems="center">
                   <Pix color="primary" fontSize="large" />

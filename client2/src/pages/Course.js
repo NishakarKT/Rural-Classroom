@@ -13,14 +13,14 @@ import ChatBox from "../components/ChatBox";
 import Chart from "../components/Chart";
 // constants
 import { COMPANY } from "../constants/vars";
-import { BASE, COURSE_GET_ENDPOINT, LECTURE_GET_ENDPOINT, LECTURE_NEW_ENDPOINT, FILE_UPLOAD_ENDPOINT, ATTENDANCE_NEW_ENDPOINT, MATERIAL_GET_ENDPOINT, MATERIAL_NEW_ENDPOINT, MESSAGE_NEW_ENDPOINT, MESSAGE_GET_ENDPOINT, RESPONSE_NEWS_ENDPOINT, TEST_GET_ENDPOINT, QUESTION_GET_ENDPOINT } from "../constants/endpoints";
+import { BASE, COURSE_GET_ENDPOINT, LECTURE_GET_ENDPOINT, LECTURE_NEW_ENDPOINT, FILE_UPLOAD_ENDPOINT, ATTENDANCE_NEW_ENDPOINT, MATERIAL_GET_ENDPOINT, MATERIAL_NEW_ENDPOINT, MESSAGE_NEW_ENDPOINT, MESSAGE_GET_ENDPOINT, RESPONSE_NEWS_ENDPOINT, TEST_GET_ENDPOINT, QUESTION_GET_ENDPOINT, DOUBT_GET_ENDPOINT, DOUBT_NEW_ENDPOINT } from "../constants/endpoints";
 import { UPLOAD_URL } from "../constants/urls";
 //utils
 import { truncate } from "../utils";
 // apis
 import { getDoubtsFromImage, getAttendanceFromImage, getResponsesFromImage, getFilteredMessages } from "../apis/multimedia";
 // mui
-import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, CardMedia, Dialog, DialogContent, DialogTitle, Badge, IconButton, TextField, ListItemButton, ListItemAvatar, Avatar, Divider, Tooltip, CircularProgress, SwipeableDrawer, Autocomplete } from "@mui/material";
+import { Box, Container, Grid, Paper, Button, Typography, List, ListItemText, Stack, Dialog, DialogContent, DialogTitle, Badge, IconButton, TextField, ListItemButton, ListItemAvatar, Avatar, Divider, Tooltip, CircularProgress, Drawer, Autocomplete } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { VideoCall, Close, Camera, Add, FileCopy, FilterAlt, FilterAltOff, Fullscreen, Checklist, PanTool, QuestionAnswer } from "@mui/icons-material";
 // vars
@@ -35,6 +35,7 @@ function PaperComponent(props) {
 }
 
 const Course = () => {
+  const youtubeRef = useRef(null);
   const myStreamRef = useRef(null);
   const peerStreamRef = useRef(null);
   const { token, user } = useContext(AppContext);
@@ -56,21 +57,21 @@ const Course = () => {
   const [doubts, setDoubts] = useState(0);
   const [responses, setResponses] = useState([]);
   const [classStrength, setClassStrength] = useState(0);
-  const [chartData, setChartData] = useState([]);
+  const [chartData, setChartData] = useState([{ doubts: 0, time: 0.0 }]);
   const [capturedImage, setCapturedImage] = useState(null);
   const [materials, setMaterials] = useState([]);
   const [materialFiles, setMaterialsFiles] = useState([]);
   const [attendance, setAttendance] = useState([]);
   const [viewMode, setViewMode] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setChartData((prev) => [...prev, { doubts: 0, time: new Date().toLocaleTimeString() }]);
-    }, 2000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setChartData((prev) => [...prev, { doubts: 0, time: new Date().toLocaleTimeString() }]);
+  //   }, 2000);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (courseId) {
@@ -126,6 +127,33 @@ const Course = () => {
         console.log(err);
         setMessages([]);
         setFilteredMessages([]);
+      }
+      // get doubts
+      try {
+        const query = { lecture: lecture._id };
+        axios
+          .get(DOUBT_GET_ENDPOINT, { headers: { Authorization: `Bearer ${token}` }, params: { query: JSON.stringify(query) } })
+          .then((res) => {
+            console.log(res.data.data);
+            if (res.data.data.length) {
+              const processedDoubts = [{ doubts: 0, time: 0 }];
+              const doubts = res.data.data.map((doubt) => ({ doubts: Number(doubt.doubts), time: Number(doubt.time).toFixed(1) }));
+              doubts.forEach((doubt) => {
+                processedDoubts.push(doubt);
+                processedDoubts.push({ doubts: 0, time: (Number(doubt.time) + 0.1).toFixed(1) });
+              });
+              setChartData(processedDoubts);
+            } else {
+              setChartData([{ doubts: 0, time: 0.0 }]);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            setChartData([{ doubts: 0, time: 0.0 }]);
+          });
+      } catch (err) {
+        console.log(err);
+        setChartData([{ doubts: 0, time: 0.0 }]);
       }
       // get test
       try {
@@ -362,10 +390,26 @@ const Course = () => {
   };
 
   const handleDoubts = async (doubts) => {
-    socket.emit("doubts", { room: courseId, doubts });
-    setDoubtsOpen(false);
-    setCapturedImage(null);
-    alert("Doubts have been raised!");
+    if (youtubeRef.current && youtubeRef.current.internalPlayer) {
+      const time = await youtubeRef.current.internalPlayer.getCurrentTime();
+      socket.emit("doubts", { room: courseId, doubts });
+      setDoubtsOpen(false);
+      setCapturedImage(null);
+      alert("Doubts have been raised!");
+      // store doubts
+      try {
+        axios
+          .post(DOUBT_NEW_ENDPOINT, { course: courseId, lecture: lecture?._id, doubts, time }, { headers: { Authorization: `Bearer ${token}` } })
+          .then((res) => {
+            console.log("Doubts created");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   const handleAttendance = async () => {
@@ -432,12 +476,12 @@ const Course = () => {
   };
 
   const handleResponsesCapture = async () => {
-    if(test && testQuestion){
+    if (test && testQuestion) {
       setIsLoading(true);
       const capturedImage = myStreamRef.current.getScreenshot();
       const imageBlob = await fetch(capturedImage).then((r) => r.blob());
       const responses = await getResponsesFromImage(imageBlob);
-      const processedResponses = responses.map((response) => ({ test: test?._id, question: testQuestion._id, student: user?._id + "_" + response.roll, response: testQuestion.options.find((q) => q.key === response.response)?.value })).filter(response => response.response && response.student);
+      const processedResponses = responses.map((response) => ({ test: test?._id, question: testQuestion._id, student: user?._id + "_" + response.roll, response: testQuestion.options.find((q) => q.key === response.response)?.value })).filter((response) => response.response && response.student);
       setResponses(processedResponses);
       setIsLoading(false);
     }
@@ -480,6 +524,7 @@ const Course = () => {
                 <Stack direction="row" alignItems="center" sx={{ position: "relative" }}>
                   {lecture ? (
                     <YouTube
+                      ref={youtubeRef}
                       style={{
                         position: "absolute",
                         zIndex: 1,
@@ -755,7 +800,7 @@ const Course = () => {
           </Grid>
         </DialogContent>
       </Dialog>
-      <SwipeableDrawer anchor={"bottom"} open={viewMode && user?.role !== "teacher"} onClose={() => setViewMode(false)} onOpen={() => setViewMode(true)} sx={{ zIndex: 99999 }}>
+      <Drawer anchor={"bottom"} open={viewMode && user?.role !== "teacher"} onClose={() => setViewMode(false)} onOpen={() => setViewMode(true)} sx={{ zIndex: 99999 }}>
         <Stack sx={{ width: "100%", height: "100vh" }}>
           <Box
             sx={{
@@ -766,6 +811,7 @@ const Course = () => {
           >
             {lecture ? (
               <YouTube
+                ref={youtubeRef}
                 style={{
                   position: "absolute",
                   zIndex: 1,
@@ -819,7 +865,7 @@ const Course = () => {
             </Stack>
           </Stack>
         </Stack>
-      </SwipeableDrawer>
+      </Drawer>
     </Container>
   );
 };
